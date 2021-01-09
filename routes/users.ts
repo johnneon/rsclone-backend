@@ -8,6 +8,8 @@ import { v4 as uuid } from 'uuid';
 
 const authRouter = Router();
 
+const customPussword = () => {};
+
 const checkRegister = [
   check('email', 'Incorect email!').isEmail().normalizeEmail(),
   check('password', 'Minimum number of characters 6!').isLength({ min: 6 })
