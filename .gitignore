@@ -1,0 +1,5 @@
+node_modules
+.DR_store
+dist
+.idea
+.vscode
