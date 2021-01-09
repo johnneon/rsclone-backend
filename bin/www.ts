@@ -1,6 +1,7 @@
 import app from '../app';
 import debuger from 'debug';
 import * as http from 'http';
+require('dotenv').config();
 
 const debug = debuger('rs-demo-backend:server');
 
