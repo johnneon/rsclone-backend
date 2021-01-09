@@ -32,7 +32,7 @@ authRouter.post('/register', checkRegister, async (req, res, next) => {
     const candidate = await collection.findOne({ email });
 
     if (candidate) {
-      return res.status(400).json({ message: 'Poshel naxui!' });
+      return res.status(400).json({ message: 'This user has been registered!' });
     }
 
     const hashedPassword = await bcrypt.hash(password, 12);
