@@ -8,19 +8,19 @@ import { v4 as uuid } from 'uuid';
 
 const authRouter = Router();
 
-const customPussword = () => {};
-
 const checkRegister = [
+  check('email', 'Incorect email!').isEmail(),
+  check('password', 'Minimum number of characters 6!').isLength({ min: 6 }),
+];
+
+const checkLogin = [
   check('email', 'Incorect email!').isEmail().normalizeEmail(),
-  check('password', 'Minimum number of characters 6!').isLength({ min: 6 })
+  check('password', 'Incorect password!').exists(),
 ];
 
 authRouter.post('/register', checkRegister, async (req, res, next) => {
   try {
     const errors = validationResult(req);
-
-    const { password, email, login } = req.body;
-
 
     if (!(errors.isEmpty())) {
       return res.status(400).json({
@@ -28,6 +28,8 @@ authRouter.post('/register', checkRegister, async (req, res, next) => {
         message: 'Incorect data!',
       });
     }
+
+    const { password, email, fullName } = req.body;
 
     const collection = await getCollection('users');
 
@@ -38,13 +40,14 @@ authRouter.post('/register', checkRegister, async (req, res, next) => {
     }
 
     const hashedPassword = await bcrypt.hash(password, 12);
+
     const id = uuid();
 
     const user: UserType = {
       email: email,
       password: hashedPassword,
-      login: login,
-      id: id,
+      fullName: fullName,
+      id: id
     };
 
     await collection.insertOne(user);
@@ -55,8 +58,40 @@ authRouter.post('/register', checkRegister, async (req, res, next) => {
   }
 });
 
-authRouter.post('/login', (req, res, next) => {
-  res.send('respond with a resource');
+authRouter.post('/login', checkLogin, async (req, res, next) => {
+  try {
+    const errors: any = validationResult(req);
+
+    if (!(errors.isEmpty())) {
+      return res.status(400).json({
+        message: errors.array()[0].msg,
+      });
+    }
+
+    const { password, email } = req.body;
+
+    const collection = await getCollection('users');
+
+    const user: any = await collection.findOne({ email });
+
+    if (!user) {
+      return res.status(400).json({ message: 'Incorect email!' });
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+
+    if (!isMatch) {
+      return res.status(400).json({ message: 'Incorect password!' })
+    }
+
+    const secret = process.env.JWT_SECRET || 'protectedone';
+
+    const token = jwt.sign({ userId: user._id }, secret, { expiresIn: '1h' });
+
+    res.json({ token, userId: user._id });
+  } catch (e) {
+    res.status(500).json({ message: 'Got an error!' });
+  }
 });
 
 export default authRouter;

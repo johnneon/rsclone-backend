@@ -1,8 +1,8 @@
 import { type } from "os";
 
 export type UserType = {
-  id: string,
-  login: string,
+  fullName: string,
   email: string,
   password: string,
+  id: string
 }
