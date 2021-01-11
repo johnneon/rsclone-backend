@@ -1,10 +1,8 @@
 import { Router } from 'express';
 import { check, validationResult } from 'express-validator';
-import { UserType } from '../types/user';
 import bcrypt = require('bcrypt');
 import jwt = require('jsonwebtoken');
-import getCollection from '../storage/mongo';
-import { v4 as uuid } from 'uuid';
+import User from '../models/User';
 
 const authRouter = Router();
 
@@ -31,9 +29,7 @@ authRouter.post('/register', checkRegister, async (req, res, next) => {
 
     const { password, email, fullName } = req.body;
 
-    const collection = await getCollection('users');
-
-    const candidate = await collection.findOne({ email });
+    const candidate = await User.findOne({ email });
 
     if (candidate) {
       return res.status(400).json({ message: 'This user has been registered!' });
@@ -41,16 +37,9 @@ authRouter.post('/register', checkRegister, async (req, res, next) => {
 
     const hashedPassword = await bcrypt.hash(password, 12);
 
-    const id = uuid();
+    const user = new User({ email, password: hashedPassword, fullName });
 
-    const user: UserType = {
-      email: email,
-      password: hashedPassword,
-      fullName: fullName,
-      id: id
-    };
-
-    await collection.insertOne(user);
+    await user.save();
 
     return res.status(201).json({ message: 'User created!' });
   } catch (e) {
@@ -68,11 +57,9 @@ authRouter.post('/login', checkLogin, async (req, res, next) => {
       });
     }
 
-    const { password, email } = req.body;
+    const { email, password } = req.body;
 
-    const collection = await getCollection('users');
-
-    const user: any = await collection.findOne({ email });
+    const user: any = await User.findOne({ email });
 
     if (!user) {
       return res.status(400).json({ message: 'Incorect email!' });
