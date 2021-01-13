@@ -43,7 +43,7 @@ authRouter.post('/register', checkRegister, async (req, res, next) => {
 
     return res.status(201).json({ message: 'User created!' });
   } catch (e) {
-    res.status(500).json({ message: 'Got an error!' });
+    return res.status(500).json({ message: 'Got an error!' });
   }
 });
 
@@ -59,7 +59,7 @@ authRouter.post('/login', checkLogin, async (req, res, next) => {
 
     const { email, password } = req.body;
 
-    const user: any = await User.findOne({ email });
+    const user: any = await User.findOne({ email }).populate('boards');
 
     if (!user) {
       return res.status(400).json({ message: 'Incorect email!' });
@@ -75,9 +75,14 @@ authRouter.post('/login', checkLogin, async (req, res, next) => {
 
     const token = jwt.sign({ userId: user._id }, secret, { expiresIn: '1h' });
 
-    res.json({ token, userId: user._id });
+    user.boards.map((el) => {
+      el.users = undefined;
+      el.columns = undefined;
+    });
+
+    return res.json({ email, fullName: user.fullName, boards: user.boards, token, userId: user._id });
   } catch (e) {
-    res.status(500).json({ message: 'Got an error!' });
+    return res.status(500).json({ message: 'Got an error!' });
   }
 });
 

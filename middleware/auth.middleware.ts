@@ -13,8 +13,8 @@ export default (req, res, next) => {
       res.status(401).json({ message: 'You are not authorized!' });
     }
 
-    // const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    // req.user = decoded;
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.body.user = decoded;
     next();
   } catch (e) {
     res.status(401).json({ message: 'You are not authorized!' });

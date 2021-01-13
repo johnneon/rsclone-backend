@@ -3,6 +3,7 @@ import express from 'express';
 import logger from 'morgan';
 import cors from 'cors';
 import authRouter from './routes/users';
+import boardRouter from './routes/boards';
 
 const app = express();
 app.use(logger('dev'));
@@ -11,6 +12,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 app.use('/api/auth', authRouter);
+app.use('/api/board', boardRouter);
 
 app.use((req, res, next) => {
   res.json({
