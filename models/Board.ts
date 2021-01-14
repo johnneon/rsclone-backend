@@ -7,7 +7,6 @@ const schema = new Schema({
     {
       name: { type: String },
       position: { type: Number, default: 0 },
-      id: { type: String, required: true, unique: true },
       cards: [{ type: Types.ObjectId, ref: 'Card' }]
     }
   ]
