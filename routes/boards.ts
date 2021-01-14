@@ -54,7 +54,12 @@ boardRouter.get('/:id', auth, async (req, res, next) => {
 boardRouter.put('/rename/:id', auth, async (req, res, next) => {
   try {
     const { name } = req.body;
+
     const board: any = await Board.updateOne({ _id: req.params.id}, { name });
+
+    if (!board) {
+      return res.status(404).json({ message: 'Can not find board!' }); 
+    }
     
     const newBoard: any = await Board.findById(req.params.id).populate('users');
     
@@ -69,6 +74,33 @@ boardRouter.put('/rename/:id', auth, async (req, res, next) => {
     }
 
     return res.status(201).json({ newBoard });
+  } catch (e) {
+    return res.status(500).json({ message: 'Got an error!' });
+  }
+});
+
+boardRouter.delete('/:id', auth, async (req, res, next) => {
+  try {
+    const board: any = await Board.findOne({ _id: req.params.id }, (err, Board) => {
+      if (err) {
+        throw err;
+      }
+
+      if (Board.users.length === 0) {
+        Board.delete();
+      }
+    });
+
+    if (!board) {
+      return res.status(404).json({ message: 'Can not find board!' }); 
+    }
+
+    await User.updateOne(
+      { _id: req.body.user.userId },
+      { $pull: { boards: req.params.id } }
+    );
+
+    return res.status(201).json({ message: 'You have successfully left the board!' });
   } catch (e) {
     return res.status(500).json({ message: 'Got an error!' });
   }
@@ -129,34 +161,6 @@ boardRouter.delete('/delete/column/:id', auth, async (req, res, next) => {
     }
 
     return res.status(201).json({ newBoard });
-  } catch (e) {
-    return res.status(500).json({ message: 'Got an error!' });
-  }
-});
-
-boardRouter.delete('/:id', auth, async (req, res, next) => {
-  try {
-    await User.updateOne(
-      { _id: req.body.user.userId },
-      { $pull: { boards: req.params.id } }
-    );
-
-    await Board.updateOne(
-      { _id: req.params.id },
-      { $pull: { users: req.body.user.userId } }
-    );
-
-    await Board.findOne({ _id: req.params.id }, (err, Board) => {
-      if (err) {
-        throw err;
-      }
-
-      if (Board.users.length === 0) {
-        Board.delete();
-      }
-    });
-
-    return res.status(201).json({ message: 'You have successfully left the board!' });
   } catch (e) {
     return res.status(500).json({ message: 'Got an error!' });
   }
