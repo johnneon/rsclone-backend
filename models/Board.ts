@@ -2,9 +2,15 @@ import { Schema, model, Types } from 'mongoose';
 
 const schema = new Schema({
   name: { type: String, required: true, unique: false },
-  date: { type: Date, default: Date.now },
   users: [{ type: Types.ObjectId, ref: 'User' }],
-  columns: [{ type: Types.ObjectId, ref: 'Column' }]
+  columns: [
+    {
+      name: { type: String },
+      position: { type: Number, default: 0 },
+      id: { type: String, required: true, unique: true },
+      cards: [{ type: Types.ObjectId, ref: 'Card' }]
+    }
+  ]
 });
 
 export default model('Board', schema);

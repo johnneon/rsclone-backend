@@ -38,7 +38,11 @@ boardRouter.get('/:id', auth, async (req, res, next) => {
     if (board) {
       const { users } = board;
 
-      users.map((el) => el.password = undefined);
+      users.map((el) => {
+        el.password = undefined;
+        el.boards = undefined;
+        el.__v = undefined;
+      });
     }
 
     return res.status(201).json({ board });
@@ -47,17 +51,81 @@ boardRouter.get('/:id', auth, async (req, res, next) => {
   }
 });
 
-boardRouter.put('/:id', auth, async (req, res, next) => {
+boardRouter.put('/rename/:id', auth, async (req, res, next) => {
   try {
     const { name } = req.body;
     const board: any = await Board.updateOne({ _id: req.params.id}, { name });
+    
+    const newBoard: any = await Board.findById(req.params.id).populate('users');
+    
+    if (newBoard) {
+      const { users } = newBoard;
+      
+      users.map((el) => {
+        el.password = undefined;
+        el.boards = undefined;
+        el.__v = undefined;
+      });
+    }
+
+    return res.status(201).json({ newBoard });
+  } catch (e) {
+    return res.status(500).json({ message: 'Got an error!' });
+  }
+});
+
+boardRouter.put('/create/column/:id', auth, async (req, res, next) => {
+  try {
+    const { name, position } = req.body;
+
+    await Board.updateOne(
+      {
+        _id: req.params.id},
+        {
+          $push: { columns: { name, position } }
+        }
+    );
 
     const newBoard: any = await Board.findById(req.params.id).populate('users');
 
     if (newBoard) {
-      const { users } = board;
+      const { users } = newBoard;
 
-      users.map((el) => el.password = undefined);
+      users.map((el) => {
+        el.password = undefined;
+        el.boards = undefined;
+        el.__v = undefined;
+      });
+    }
+
+    return res.status(201).json({ newBoard });
+  } catch (e) {
+    return res.status(500).json({ message: 'Got an error!' });
+  }
+});
+
+boardRouter.delete('/delete/column/:id', auth, async (req, res, next) => {
+  try {
+
+    const { id } = req.body;
+
+    await Board.updateOne(
+      { _id: req.params.id },
+      {
+        $pull: { columns: { _id: id } }
+      }
+    );
+
+    const newBoard: any = await Board.findById(req.params.id).populate('users');
+
+    if (newBoard) {
+      const { users } = newBoard;
+
+      users.map((el) => {
+        el.password = undefined;
+        el.boards = undefined;
+        el.__v = undefined;
+      });
     }
 
     return res.status(201).json({ newBoard });

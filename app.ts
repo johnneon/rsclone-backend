@@ -4,6 +4,7 @@ import logger from 'morgan';
 import cors from 'cors';
 import authRouter from './routes/users';
 import boardRouter from './routes/boards';
+import cardsRouter from './routes/cards';
 
 const app = express();
 app.use(logger('dev'));
@@ -13,6 +14,7 @@ app.use(express.urlencoded({ extended: false }));
 
 app.use('/api/auth', authRouter);
 app.use('/api/board', boardRouter);
+app.use('/api/cards', cardsRouter);
 
 app.use((req, res, next) => {
   res.json({
