@@ -1,0 +1,123 @@
+[
+  {
+    "url": "https://rsclone-back-end.herokuapp.com/board/",
+    "method": "POST",
+    "body": {
+      "name": "board name"
+    },
+    "headers": {
+      "Authorization": "Bearer TOKEN"
+    },
+    "response": {
+      "board": {
+          "users": [
+              "600289a641e2b90fe4ca4186"
+          ],
+          "columns": [],
+          "_id": "6002e8bca1ab540017f2cb6b",
+          "name": "board name"
+      }
+  },
+    "erros": {
+      "name": { "message": "The name can not contain invalid characters!" },
+      "500": { "message": "Got an error!" },
+      "401": { "message": "You are not authorized!" }
+    }
+  },
+  {
+    "url": "https://rsclone-back-end.herokuapp.com/board/",
+    "method": "GET",
+    "headers": {
+      "Authorization": "Bearer TOKEN"
+    },
+    "response": {
+      "board": {
+          "users": [
+              "600289a641e2b90fe4ca4186"
+          ],
+          "columns": [
+              {
+                  "position": 0,
+                  "cards": [
+                      {
+                          "position": 0,
+                          "_id": "6002f052a1ab540017f2cb71",
+                          "name": "new card1",
+                          "column": "6002ef61a1ab540017f2cb6e"
+                      }
+                  ],
+                  "_id": "6002ef61a1ab540017f2cb6e",
+                  "name": "column name",
+                  "boardId": "6002ea87a1ab540017f2cb6c"
+              },
+              {
+                  "position": 0,
+                  "cards": [
+                      {
+                          "position": 0,
+                          "_id": "6002ef75a1ab540017f2cb6f",
+                          "name": "new name",
+                          "column": "6002f007a1ab540017f2cb70",
+                          "content": "new content"
+                      }
+                  ],
+                  "_id": "6002f007a1ab540017f2cb70",
+                  "name": "column name",
+                  "boardId": "6002ea87a1ab540017f2cb6c"
+              }
+          ],
+          "_id": "6002ea87a1ab540017f2cb6c",
+          "name": "board name"
+      }
+    },
+    "erros": {
+      "name": { "message": "The name can not contain invalid characters!" },
+      "500": { "message": "Got an error!" },
+      "401": { "message": "You are not authorized!" }
+    }
+  },
+  {
+    "url": "https://rsclone-back-end.herokuapp.com/board/:id",
+    "method": "PUT",
+    "body": {
+      "name": "new name"
+    },
+    "headers": {
+      "Authorization": "Bearer TOKEN"
+    },
+    "response": {
+      "newBoard": {
+          "users": [
+              {
+                  "_id": "600289a641e2b90fe4ca4186",
+                  "email": "j@mail.ru",
+                  "fullName": "john"
+              }
+          ],
+          "columns": [],
+          "_id": "6002e8bca1ab540017f2cb6b",
+          "name": "new Name"
+      }
+  },
+    "erros": {
+      "name": { "message": "The name can not contain invalid characters!" },
+      "500": { "message": "Got an error!" },
+      "401": { "message": "You are not authorized!" }
+    }
+  },
+  {
+    "url": "https://rsclone-back-end.herokuapp.com/board/:id",
+    "method": "DELETE",
+    "headers": {
+      "Authorization": "Bearer TOKEN"
+    },
+    "response": {
+      "message": "You have successfully left the board!"
+    },
+    "erros": {
+      "404": { "message": "Can not find board!" },
+      "500": { "message": "Got an error!" },
+      "401": { "message": "You are not authorized!" }
+    }
+  }
+]

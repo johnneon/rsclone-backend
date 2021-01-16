@@ -6,9 +6,15 @@ import auth from '../middleware/auth.middleware';
 
 const columnRouter = Router();
 
-columnRouter.post('/create', auth, async (req, res, next) => {
+columnRouter.post('/', auth, async (req, res, next) => {
   try {
     const { name, position, boardId } = req.body;
+
+    const check = /^.*?(?=[\^#%&$\*:<>\?/\{\|\}]).*$/g;
+
+    if (check.test(name)) {
+      return res.status(400).json({ message: 'The name can not contain invalid characters!' });
+    }
 
     if (!boardId) {
       return res.status(400).json({ message: 'Board not found!' });
@@ -28,11 +34,13 @@ columnRouter.post('/create', auth, async (req, res, next) => {
 
 columnRouter.get('/:id', auth, async (req, res, next) => {
   try {
-    const column: any = await Column.findById(req.params.id);
+    const column: any = await Column.findById(req.params.id).populate('cards');
 
-    const cards = await Card.find({ column: req.params.id });
-    
-    return res.status(201).json({ column, cards: [...cards] });
+    if (!column) {
+      return res.status(400).json({ message: 'Column not found!' });
+    }
+
+    return res.status(201).json({ column });
   } catch (e) {
     return res.status(500).json({ message: 'Got an error!' });
   }
@@ -46,6 +54,12 @@ columnRouter.put('/:id', auth, async (req, res, next) => {
 
 
     if (name) {
+      const check = /^.*?(?=[\^#%&$\*:<>\?/\{\|\}]).*$/g;
+
+      if (check.test(name)) {
+        return res.status(400).json({ message: 'The name can not contain invalid characters!' });
+      }
+
       column.name = name;
     }
     if (position || position === 0) {

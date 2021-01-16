@@ -6,7 +6,7 @@ import auth from '../middleware/auth.middleware';
 
 const boardRouter = Router();
 
-boardRouter.post('/create', auth, async (req, res, next) => {
+boardRouter.post('/', auth, async (req, res, next) => {
   try {
     const { name, user } = req.body;
 
@@ -17,6 +17,8 @@ boardRouter.post('/create', auth, async (req, res, next) => {
     }
 
     const board = new Board({ name, users: [user.userId] });
+
+    board.__v = undefined;
 
     await User.updateOne({ _id: user.userId }, {'$push' : {'boards': board._id} });
 

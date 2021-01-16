@@ -1,0 +1,89 @@
+[
+  {
+    "url": "https://rsclone-back-end.herokuapp.com/cards/",
+    "method": "POST",
+    "body": {
+      "name": "new Card",
+      "column": "6002ef61a1ab540017f2cb6e",
+      "position": 0
+    },
+    "headers": {
+      "Authorization": "Bearer TOKEN"
+    },
+    "response": {
+      "card": {
+          "position": 0,
+          "_id": "6002ef75a1ab540017f2cb6f",
+          "name": "new card",
+          "column": "6002ef61a1ab540017f2cb6e"
+      }
+    },
+    "erros": {
+      "name": { "message": "The name can not contain invalid characters!" },
+      "500": { "message": "Got an error!" },
+      "401": { "message": "You are not authorized!" }
+    }
+  },
+  {
+    "url": "https://rsclone-back-end.herokuapp.com/cards/:id",
+    "method": "GET",
+    "headers": {
+      "Authorization": "Bearer TOKEN"
+    },
+    "response": {
+      "card": {
+          "position": 0,
+          "_id": "6002ef75a1ab540017f2cb6f",
+          "name": "new card",
+          "column": "6002ef61a1ab540017f2cb6e"
+      }
+    },
+    "erros": {
+      "400": { "message": "Card not found!" },
+      "500": { "message": "Got an error!" },
+      "401": { "message": "You are not authorized!" }
+    }
+  },
+  {
+    "url": "https://rsclone-back-end.herokuapp.com/cards/:id",
+    "method": "PUT",
+    "body": {
+      "name": "new name",
+      "position": 0,
+      "content": "new content",
+      "column": "new column ID (for preview it's 6002f007a1ab540017f2cb70)"
+    },
+    "headers": {
+      "Authorization": "Bearer TOKEN"
+    },
+    "response": {
+      "card": {
+          "position": 0,
+          "_id": "6002ef75a1ab540017f2cb6f",
+          "name": "new name",
+          "column": "6002f007a1ab540017f2cb70",
+          "content": "new content"
+      }
+    },
+    "erros": {
+      "name": { "message": "The name can not contain invalid characters!" },
+      "500": { "message": "Got an error!" },
+      "401": { "message": "You are not authorized!" }
+    }
+  },
+  {
+    "url": "https://rsclone-back-end.herokuapp.com/cards/:id",
+    "method": "DELETE",
+    "headers": {
+      "Authorization": "Bearer TOKEN"
+    },
+    "response": {
+      "message": "Card has been deleted!"
+    },
+    "erros": {
+      "400": { "message": "Card not found!" },
+      "500": { "message": "Got an error!" },
+      "401": { "message": "You are not authorized!" }
+    }
+  }
+]

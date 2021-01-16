@@ -5,7 +5,7 @@ import auth from '../middleware/auth.middleware';
 
 const cardsRouter = Router();
 
-cardsRouter.post('/create', auth, async (req, res, next) => {
+cardsRouter.post('/', auth, async (req, res, next) => {
   try {
     const { name, position, column } = req.body;
 
