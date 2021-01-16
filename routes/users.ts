@@ -78,6 +78,9 @@ authRouter.post('/login', checkLogin, async (req, res, next) => {
     user.boards.map((el) => {
       el.users = undefined;
       el.columns = undefined;
+      el.id = el._id;
+      el._id = undefined;
+      el.__v = undefined;
     });
 
     return res.json({ email, fullName: user.fullName, boards: user.boards, token, userId: user._id });

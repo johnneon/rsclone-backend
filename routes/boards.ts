@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import Board from '../models/Board';
+import Column from '../models/Column';
 import User from '../models/User';
 import auth from '../middleware/auth.middleware';
 
@@ -81,7 +82,7 @@ boardRouter.put('/rename/:id', auth, async (req, res, next) => {
 
 boardRouter.delete('/:id', auth, async (req, res, next) => {
   try {
-    const board: any = await Board.findOne({ _id: req.params.id }, (err, Board) => {
+    const board: any = await Board.findOne({ _id: req.params.id }, async (err, Board) => {
       if (err) {
         throw err;
       }
@@ -101,66 +102,6 @@ boardRouter.delete('/:id', auth, async (req, res, next) => {
     );
 
     return res.status(201).json({ message: 'You have successfully left the board!' });
-  } catch (e) {
-    return res.status(500).json({ message: 'Got an error!' });
-  }
-});
-
-boardRouter.put('/create/column/:id', auth, async (req, res, next) => {
-  try {
-    const { name, position } = req.body;
-
-    await Board.updateOne(
-      {
-        _id: req.params.id},
-        {
-          $push: { columns: { name, position } }
-        }
-    );
-
-    const newBoard: any = await Board.findById(req.params.id).populate('users');
-
-    if (newBoard) {
-      const { users } = newBoard;
-
-      users.map((el) => {
-        el.password = undefined;
-        el.boards = undefined;
-        el.__v = undefined;
-      });
-    }
-
-    return res.status(201).json({ newBoard });
-  } catch (e) {
-    return res.status(500).json({ message: 'Got an error!' });
-  }
-});
-
-boardRouter.delete('/delete/column/:id', auth, async (req, res, next) => {
-  try {
-
-    const { id } = req.body;
-
-    await Board.updateOne(
-      { _id: req.params.id },
-      {
-        $pull: { columns: { _id: id } }
-      }
-    );
-
-    const newBoard: any = await Board.findById(req.params.id).populate('users');
-
-    if (newBoard) {
-      const { users } = newBoard;
-
-      users.map((el) => {
-        el.password = undefined;
-        el.boards = undefined;
-        el.__v = undefined;
-      });
-    }
-
-    return res.status(201).json({ newBoard });
   } catch (e) {
     return res.status(500).json({ message: 'Got an error!' });
   }

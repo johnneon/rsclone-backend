@@ -1,0 +1,9 @@
+import { Schema, model, Types } from 'mongoose';
+
+const schema = new Schema({
+  name: { type: String, required: true, unique: false },
+  position: { type: Number, default: 0, unique: false },
+  boardId: { type: Types.ObjectId, ref: 'Board' }
+});
+
+export default model('Column', schema);

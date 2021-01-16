@@ -3,8 +3,7 @@ import { Schema, model, Types } from 'mongoose';
 const schema = new Schema({
   name: { type: String, required: true },
   position: { type: Number, default: 0 },
-  column: { type: String },
-  board: { type: Types.ObjectId, ref: 'Board' },
+  column: { type: Types.ObjectId, ref: 'Column' },
   content: { type: String }
 });
 
