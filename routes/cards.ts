@@ -17,9 +17,12 @@ cardsRouter.post('/create', auth, async (req, res, next) => {
 
     const card: any = new Card({ name, position, column });
 
-    card.save();
+    await Column.updateOne({ _id: column }, { $push: { cards: card._id } })
 
     card.__v = undefined;
+    
+    card.save();
+
 
     return res.status(201).json({ card });
   } catch (e) {
@@ -50,6 +53,11 @@ cardsRouter.delete('/:id', auth, async (req, res, next) => {
     if (!card) {
       return res.status(404).json({ message: 'Card no found!' });
     }
+
+    await Column.updateOne(
+      { _id: card.column },
+      { $pull: { cards: req.params.id } }
+    );
 
     return res.status(200).json({ message: 'Card has been deleted!' });
   } catch (e) {
@@ -85,14 +93,18 @@ cardsRouter.put('/update/:id', auth, async (req, res, next) => {
 
     if (column) {
       const prevColumn = card.column;
+      
+      await Column.updateOne(
+        { _id: prevColumn },
+        { $pull: { cards: req.params.id } }
+      );
 
-      const newColumn = await Column.findById(prevColumn);
+      await Column.updateOne(
+        { _id: column },
+        { $push: { cards: req.params.id } }
+      );
 
-      if (newColumn) {
-        card.column = column;
-      } else {
-        return res.status(404).json({ message: 'Column not found!' })
-      }
+      card.column = column;
     }
 
     card.save();

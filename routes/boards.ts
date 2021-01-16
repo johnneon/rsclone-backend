@@ -30,7 +30,13 @@ boardRouter.post('/create', auth, async (req, res, next) => {
 
 boardRouter.get('/:id', auth, async (req, res, next) => {
   try {
-    const board: any = await Board.findById(req.params.id).populate('users');
+    const boardPopulate = {
+      path: 'columns',
+      populate: {
+        path: 'cards'
+      }
+    }
+    const board: any = await Board.findById(req.params.id).populate(boardPopulate);
 
     if (!board) {
       return res.status(404).json({ message: 'Can not find board!' }); 
