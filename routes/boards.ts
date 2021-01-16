@@ -58,7 +58,7 @@ boardRouter.get('/:id', auth, async (req, res, next) => {
   }
 });
 
-boardRouter.put('/rename/:id', auth, async (req, res, next) => {
+boardRouter.put('/:id', auth, async (req, res, next) => {
   try {
     const { name } = req.body;
 

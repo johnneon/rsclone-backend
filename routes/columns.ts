@@ -38,7 +38,7 @@ columnRouter.get('/:id', auth, async (req, res, next) => {
   }
 });
 
-columnRouter.put('/update/:id', auth, async (req, res, next) => {
+columnRouter.put('/:id', auth, async (req, res, next) => {
   try {
     const { name, position } = req.body;
     

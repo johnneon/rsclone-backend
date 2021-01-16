@@ -20,7 +20,7 @@ cardsRouter.post('/create', auth, async (req, res, next) => {
     await Column.updateOne({ _id: column }, { $push: { cards: card._id } })
 
     card.__v = undefined;
-    
+
     card.save();
 
 
@@ -65,7 +65,7 @@ cardsRouter.delete('/:id', auth, async (req, res, next) => {
   }
 });
 
-cardsRouter.put('/update/:id', auth, async (req, res, next) => {
+cardsRouter.put('/:id', auth, async (req, res, next) => {
   try {
 
     const { name, position, content, column } = req.body;
