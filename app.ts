@@ -1,13 +1,14 @@
-import mongoose from 'mongoose';
-import express from 'express';
+import express, { Request, Response, Application, Errback } from 'express';
 import logger from 'morgan';
 import cors from 'cors';
+import connect from './connect';
+import { HttpException } from './exceptions/HttpExpection';
 import authRouter from './routes/users';
 import boardRouter from './routes/boards';
 import columnRouter from './routes/columns';
 import cardsRouter from './routes/cards';
 
-const app = express();
+const app: Application = express();
 
 app.use(logger('dev'));
 app.use(cors());
@@ -19,13 +20,13 @@ app.use('/api/board', boardRouter);
 app.use('/api/column', columnRouter);
 app.use('/api/cards', cardsRouter);
 
-app.use((req, res, next) => {
+app.use((req: Request, res: Response) => {
   res.json({
     statusCode: 404,
   });
 });
 
-app.use( (err, req, res, next) => {
+app.use( (err: HttpException, req: Request, res: Response) => {
   res.json({
     statusCode: 500,
     message: err.message,
@@ -33,21 +34,8 @@ app.use( (err, req, res, next) => {
   });
 });
 
-const MONGO_URI = process.env.MONGODB_URI || 'mongodb+srv://licht:rsclone@rsclone.clvvf.mongodb.net/rsclone?retryWrites=true&w=majority';
+const uri = process.env.MONGODB_URI || 'mongodb+srv://licht:rsclone@rsclone.clvvf.mongodb.net/rsclone?retryWrites=true&w=majority';
 
-const start = async () => {
-  try {
-    await mongoose.connect(MONGO_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-      useCreateIndex: true,
-    });
-  } catch (e) {
-    console.warn(e.message);
-    process.exit(1);
-  }
-}
-
-start();
+connect({ uri });
 
 export default app;

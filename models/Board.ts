@@ -1,9 +1,19 @@
-import { Schema, model, Types } from 'mongoose';
+import { Schema, model, Types, Document } from 'mongoose';
+import { IColumn } from './Column';
+import { IUser } from './User';
 
-const schema = new Schema({
+export interface IBoard extends Document {
+  name: string;
+  users: Array<IUser['_id']>;
+  columns: Array<IColumn['_id']>;
+}
+
+const BoardSchema: Schema = new Schema({
   name: { type: String, required: true, unique: false },
   users: [{ type: Types.ObjectId, ref: 'User' }],
   columns: [{ type: Types.ObjectId, ref: 'Column' }]
+}, {
+  versionKey: false
 });
 
-export default model('Board', schema);
+export default model<IBoard>('Board', BoardSchema);

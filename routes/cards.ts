@@ -19,8 +19,6 @@ cardsRouter.post('/', auth, async (req, res, next) => {
 
     await Column.updateOne({ _id: column }, { $push: { cards: card._id } })
 
-    card.__v = undefined;
-
     card.save();
 
 
@@ -37,8 +35,6 @@ cardsRouter.get('/:id', auth, async (req, res, next) => {
     if (!card) {
       return res.status(404).json({ message: 'Card no found!' });
     }
-
-    card.__v = undefined;
 
     return res.status(201).json({ card });
   } catch (e) {
@@ -108,8 +104,6 @@ cardsRouter.put('/:id', auth, async (req, res, next) => {
     }
 
     card.save();
-
-    card.__v = undefined;
 
     return res.status(201).json({ card });
   } catch (e) {

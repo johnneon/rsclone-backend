@@ -18,8 +18,6 @@ boardRouter.post('/', auth, async (req, res, next) => {
 
     const board = new Board({ name, users: [user.userId] });
 
-    board.__v = undefined;
-
     await User.updateOne({ _id: user.userId }, {'$push' : {'boards': board._id} });
 
     board.save();
@@ -50,7 +48,6 @@ boardRouter.get('/:id', auth, async (req, res, next) => {
       users.map((el) => {
         el.password = undefined;
         el.boards = undefined;
-        el.__v = undefined;
       });
     }
 
@@ -78,7 +75,6 @@ boardRouter.put('/:id', auth, async (req, res, next) => {
       users.map((el) => {
         el.password = undefined;
         el.boards = undefined;
-        el.__v = undefined;
       });
     }
 
