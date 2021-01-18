@@ -1,6 +1,6 @@
 [
   {
-    "url": "https://rsclone-back-end.herokuapp.com/board/",
+    "url": "https://rsclone-back-end.herokuapp.com/api/board/",
     "method": "POST",
     "body": {
       "name": "board name"

@@ -1,33 +1,22 @@
 import { Router } from 'express';
-import { check, validationResult } from 'express-validator';
-import bcrypt = require('bcrypt');
-import jwt = require('jsonwebtoken');
-import { UserType } from '../types/user';
-import User from '../models/User';
 import { Request, Response } from 'express';
+import { validationResult } from 'express-validator';
+import { IUser } from './../models/User';
 import UserController from '../controllers/user.controller';
+import bcrypt = require('bcrypt');
+import checkMiddleware from '../middleware/check.middleware';
+import global from '../variables';
 
 const authRouter = Router();
 
-const checkRegister = [
-  check('email', 'Incorect email!').isEmail(),
-  check('fullName', 'Type of name must be string!').isString(),
-  check('password', 'Minimum number of characters 6!').isLength({ min: 6 }),
-];
-
-const checkLogin = [
-  check('email', 'Incorect email!').isEmail().normalizeEmail(),
-  check('password', 'Incorect password!').exists(),
-];
-
-authRouter.post('/register', checkRegister, async (req: Request, res: Response) => {
+authRouter.post('/register', checkMiddleware.checkRegister, async (req: Request, res: Response) => {
   try {
     const errors = validationResult(req);
 
     if (!(errors.isEmpty())) {
       return res.status(400).json({
         errors: errors.array(),
-        message: 'Incorect data!',
+        message: global.INCORECT_DATA,
       });
     }
 
@@ -37,42 +26,44 @@ authRouter.post('/register', checkRegister, async (req: Request, res: Response) 
 
     return res.status(201).json(answer);
   } catch (e) {
-    return res.status(500).json({ message: 'Got an error!' });
+    return res.status(500).json({ message: global.RANDOM_ERROR });
   }
 });
 
-authRouter.post('/login', checkLogin, async (req: Request, res: Response) => {
+authRouter.post('/login', checkMiddleware.checkLogin, async (req: Request, res: Response) => {
   try {
     const errors = validationResult(req);
 
     if (!(errors.isEmpty())) {
       return res.status(400).json({
         errors: errors.array(),
-        message: 'Incorect data!',
+        message: global.INCORECT_DATA,
       });
     }
 
     const { email, password } = req.body;
 
-    const user: any = await User.findOne({ email }).populate('boards');
+    const user: IUser = await UserController.SignIn({ email });
 
     if (!user) {
-      return res.status(400).json({ message: 'Incorect email!' });
+      return res.status(404).json({ message: global.USER_NOT_FOUND });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
 
     if (!isMatch) {
-      return res.status(400).json({ message: 'Incorect password!' })
+      return res.status(400).json({ message: global.INCORECT_PASS });
     }
 
-    const secret = process.env.JWT_SECRET || 'protectedone';
-
-    const token = jwt.sign({ userId: user._id }, secret, { expiresIn: '1h' });
-
-    return res.json({ email, fullName: user.fullName, boards: user.boards, token, userId: user._id });
+    return res.json({
+      email: user.email,
+      fullName: user.fullName,
+      boards: user.boards,
+      token: user.token,
+      userId: user._id
+    });
   } catch (e) {
-    return res.status(500).json({ message: 'Got an error!' });
+    return res.status(500).json({ message: global.RANDOM_ERROR });
   }
 });
 

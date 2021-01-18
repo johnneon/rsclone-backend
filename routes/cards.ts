@@ -1,11 +1,11 @@
-import { Router } from 'express';
+import { Request, Response, Router } from 'express';
 import Column from '../models/Column';
-import Card from '../models/Card';
+import Card, { ICard } from '../models/Card';
 import auth from '../middleware/auth.middleware';
 
 const cardsRouter = Router();
 
-cardsRouter.post('/', auth, async (req, res, next) => {
+cardsRouter.post('/', auth, async (req: Request, res: Response) => {
   try {
     const { name, position, column } = req.body;
 
@@ -15,7 +15,7 @@ cardsRouter.post('/', auth, async (req, res, next) => {
       return res.status(400).json({ message: 'The name can not contain invalid characters!' });
     }
 
-    const card: any = new Card({ name, position, column });
+    const card: ICard = new Card({ name, position, column });
 
     await Column.updateOne({ _id: column }, { $push: { cards: card._id } })
 
@@ -28,9 +28,9 @@ cardsRouter.post('/', auth, async (req, res, next) => {
   }
 });
 
-cardsRouter.get('/:id', auth, async (req, res, next) => {
+cardsRouter.get('/:id', auth, async (req: Request, res: Response) => {
   try {
-    const card: any = await Card.findById(req.params.id);
+    const card: ICard = await Card.findById(req.params.id);
 
     if (!card) {
       return res.status(404).json({ message: 'Card no found!' });
@@ -42,9 +42,9 @@ cardsRouter.get('/:id', auth, async (req, res, next) => {
   }
 });
 
-cardsRouter.delete('/:id', auth, async (req, res, next) => {
+cardsRouter.delete('/:id', auth, async (req: Request, res: Response) => {
   try {
-    const card: any = await Card.findByIdAndDelete(req.params.id);
+    const card: ICard = await Card.findByIdAndDelete(req.params.id);
 
     if (!card) {
       return res.status(404).json({ message: 'Card no found!' });
@@ -61,12 +61,12 @@ cardsRouter.delete('/:id', auth, async (req, res, next) => {
   }
 });
 
-cardsRouter.put('/:id', auth, async (req, res, next) => {
+cardsRouter.put('/:id', auth, async (req: Request, res: Response) => {
   try {
 
     const { name, position, content, column } = req.body;
 
-    const card: any = await Card.findById(req.params.id);
+    const card: ICard = await Card.findById(req.params.id);
 
 
     if (name) {

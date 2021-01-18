@@ -1,4 +1,4 @@
-import express, { Request, Response, Application, Errback } from 'express';
+import express, { Request, Response, Application } from 'express';
 import logger from 'morgan';
 import cors from 'cors';
 import connect from './connect';

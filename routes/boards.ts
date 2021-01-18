@@ -1,22 +1,22 @@
-import { Router } from 'express';
-import Board from '../models/Board';
-import Column from '../models/Column';
-import User from '../models/User';
+import Board, { IBoard } from '../models/Board';
+import { Request, Response, Router } from 'express';
+import User, { IUser } from '../models/User';
 import auth from '../middleware/auth.middleware';
+import global from '../variables';
 
 const boardRouter = Router();
 
-boardRouter.post('/', auth, async (req, res, next) => {
+boardRouter.post('/', auth, async (req: Request, res: Response) => {
   try {
     const { name, user } = req.body;
 
     const check = /^.*?(?=[\^#%&$\*:<>\?/\{\|\}]).*$/g;
 
     if (check.test(name)) {
-      return res.status(400).json({ message: 'The name can not contain invalid characters!' });
+      return res.status(400).json({ message: global.INCORECT_CHARTS });
     }
 
-    const board = new Board({ name, users: [user.userId] });
+    const board: IBoard = new Board({ name, users: [user.userId] });
 
     await User.updateOne({ _id: user.userId }, {'$push' : {'boards': board._id} });
 
@@ -24,11 +24,11 @@ boardRouter.post('/', auth, async (req, res, next) => {
 
     return res.status(201).json({ board });
   } catch (e) {
-    return res.status(500).json({ message: 'Got an error!' });
+    return res.status(500).json({ message: global.RANDOM_ERROR });
   }
 });
 
-boardRouter.get('/:id', auth, async (req, res, next) => {
+boardRouter.get('/:id', auth, async (req: Request, res: Response) => {
   try {
     const boardPopulate = {
       path: 'columns',
@@ -36,57 +36,57 @@ boardRouter.get('/:id', auth, async (req, res, next) => {
         path: 'cards'
       }
     }
-    const board: any = await Board.findById(req.params.id).populate(boardPopulate);
+    const board: IBoard = await Board.findById(req.params.id).populate(boardPopulate);
 
     if (!board) {
-      return res.status(404).json({ message: 'Can not find board!' }); 
+      return res.status(404).json({ message: global.BOARD_NOT_FOUND }); 
     }
 
     if (board) {
       const { users } = board;
 
-      users.map((el) => {
-        el.password = undefined;
-        el.boards = undefined;
+      users.map((user: IUser) => {
+        user.password = undefined;
+        user.boards = undefined;
       });
     }
 
     return res.status(201).json({ board });
   } catch (e) {
-    return res.status(500).json({ message: 'Got an error!' });
+    return res.status(500).json({ message: global.RANDOM_ERROR });
   }
 });
 
-boardRouter.put('/:id', auth, async (req, res, next) => {
+boardRouter.put('/:id', auth, async (req: Request, res: Response) => {
   try {
     const { name } = req.body;
 
-    const board: any = await Board.updateOne({ _id: req.params.id}, { name });
+    const board: IBoard = await Board.updateOne({ _id: req.params.id}, { name });
 
     if (!board) {
-      return res.status(404).json({ message: 'Can not find board!' }); 
+      return res.status(404).json({ message: global.BOARD_NOT_FOUND }); 
     }
     
-    const newBoard: any = await Board.findById(req.params.id).populate('users');
+    const newBoard: IBoard = await Board.findById(req.params.id).populate('users');
     
     if (newBoard) {
       const { users } = newBoard;
       
-      users.map((el) => {
-        el.password = undefined;
-        el.boards = undefined;
+      users.map((user: IUser) => {
+        user.password = undefined;
+        user.boards = undefined;
       });
     }
 
     return res.status(201).json({ newBoard });
   } catch (e) {
-    return res.status(500).json({ message: 'Got an error!' });
+    return res.status(500).json({ message: global.RANDOM_ERROR });
   }
 });
 
-boardRouter.delete('/:id', auth, async (req, res, next) => {
+boardRouter.delete('/:id', auth, async (req: Request, res: Response) => {
   try {
-    const board: any = await Board.findOne({ _id: req.params.id }, async (err, Board) => {
+    const board: IBoard = await Board.findOne({ _id: req.params.id }, async (err, Board) => {
       if (err) {
         throw err;
       }
@@ -97,7 +97,7 @@ boardRouter.delete('/:id', auth, async (req, res, next) => {
     });
 
     if (!board) {
-      return res.status(404).json({ message: 'Can not find board!' }); 
+      return res.status(404).json({ message: global.BOARD_NOT_FOUND }); 
     }
 
     await User.updateOne(
@@ -105,9 +105,9 @@ boardRouter.delete('/:id', auth, async (req, res, next) => {
       { $pull: { boards: req.params.id } }
     );
 
-    return res.status(201).json({ message: 'You have successfully left the board!' });
+    return res.status(201).json({ message: global.LEFT_BOARD });
   } catch (e) {
-    return res.status(500).json({ message: 'Got an error!' });
+    return res.status(500).json({ message: global.RANDOM_ERROR });
   }
 });
 

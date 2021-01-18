@@ -1,12 +1,12 @@
-import { Router } from 'express';
-import Column from '../models/Column';
+import { Request, Response, Router } from 'express';
+import Column, { IColumn } from '../models/Column';
 import Board from '../models/Board';
 import Card from '../models/Card';
 import auth from '../middleware/auth.middleware';
 
 const columnRouter = Router();
 
-columnRouter.post('/', auth, async (req, res, next) => {
+columnRouter.post('/', auth, async (req: Request, res: Response) => {
   try {
     const { name, position, boardId } = req.body;
 
@@ -20,7 +20,7 @@ columnRouter.post('/', auth, async (req, res, next) => {
       return res.status(400).json({ message: 'Board not found!' });
     }
     
-    const column: any = new Column({ name, position, boardId });
+    const column: IColumn = new Column({ name, position, boardId });
     
     await Board.updateOne({ _id: boardId }, { $push: { columns: { _id: column._id } } });
     
@@ -32,9 +32,9 @@ columnRouter.post('/', auth, async (req, res, next) => {
   }
 });
 
-columnRouter.get('/:id', auth, async (req, res, next) => {
+columnRouter.get('/:id', auth, async (req: Request, res: Response) => {
   try {
-    const column: any = await Column.findById(req.params.id).populate('cards');
+    const column: IColumn = await Column.findById(req.params.id).populate('cards');
 
     if (!column) {
       return res.status(400).json({ message: 'Column not found!' });
@@ -46,11 +46,11 @@ columnRouter.get('/:id', auth, async (req, res, next) => {
   }
 });
 
-columnRouter.put('/:id', auth, async (req, res, next) => {
+columnRouter.put('/:id', auth, async (req: Request, res: Response) => {
   try {
     const { name, position } = req.body;
     
-    const column: any = await Column.findById(req.params.id);
+    const column: IColumn = await Column.findById(req.params.id);
 
 
     if (name) {
@@ -74,9 +74,9 @@ columnRouter.put('/:id', auth, async (req, res, next) => {
   }
 });
 
-columnRouter.delete('/:id', auth, async (req, res, next) => {
+columnRouter.delete('/:id', auth, async (req: Request, res: Response) => {
   try {
-    const column: any = await Column.findByIdAndDelete(req.params.id);
+    const column: IColumn = await Column.findByIdAndDelete(req.params.id);
 
     await Board.updateOne(
       { _id: column.boardId },

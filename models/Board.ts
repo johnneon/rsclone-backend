@@ -4,8 +4,9 @@ import { IUser } from './User';
 
 export interface IBoard extends Document {
   name: string;
-  users: Array<IUser['_id']>;
+  users: Array<IUser['_id'] | object>;
   columns: Array<IColumn['_id']>;
+  boardId?: string;
 }
 
 const BoardSchema: Schema = new Schema({
