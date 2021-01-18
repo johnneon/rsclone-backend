@@ -3,26 +3,23 @@ import { Request, Response, Router } from 'express';
 import User, { IUser } from '../models/User';
 import auth from '../middleware/auth.middleware';
 import global from '../variables';
+import BoardController from '../controllers/board.controller';
 
 const boardRouter = Router();
 
 boardRouter.post('/', auth, async (req: Request, res: Response) => {
   try {
-    const { name, user } = req.body;
+    const { name } = req.body;
 
-    const check = /^.*?(?=[\^#%&$\*:<>\?/\{\|\}]).*$/g;
+    const check = global.FORBIDDEN_SYMBOLS_REGEXP;
 
     if (check.test(name)) {
       return res.status(400).json({ message: global.INCORECT_CHARTS });
     }
 
-    const board: IBoard = new Board({ name, users: [user.userId] });
+    const board: Promise<IBoard> = await BoardController.CreateBoard({ ...req.body });
 
-    await User.updateOne({ _id: user.userId }, {'$push' : {'boards': board._id} });
-
-    board.save();
-
-    return res.status(201).json({ board });
+    return res.status(201).json(board);
   } catch (e) {
     return res.status(500).json({ message: global.RANDOM_ERROR });
   }
@@ -30,28 +27,13 @@ boardRouter.post('/', auth, async (req: Request, res: Response) => {
 
 boardRouter.get('/:id', auth, async (req: Request, res: Response) => {
   try {
-    const boardPopulate = {
-      path: 'columns',
-      populate: {
-        path: 'cards'
-      }
-    }
-    const board: IBoard = await Board.findById(req.params.id).populate(boardPopulate);
+    const board: IBoard = await BoardController.GetFullBoard({ id: req.params.id });
 
     if (!board) {
       return res.status(404).json({ message: global.BOARD_NOT_FOUND }); 
     }
 
-    if (board) {
-      const { users } = board;
-
-      users.map((user: IUser) => {
-        user.password = undefined;
-        user.boards = undefined;
-      });
-    }
-
-    return res.status(201).json({ board });
+    return res.status(201).json(board);
   } catch (e) {
     return res.status(500).json({ message: global.RANDOM_ERROR });
   }

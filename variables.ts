@@ -9,4 +9,5 @@ export default {
   INCORECT_CHARTS: 'The name can not contain invalid characters!',
   BOARD_NOT_FOUND: 'Can not find board!',
   LEFT_BOARD: 'You have successfully left the board!',
+  FORBIDDEN_SYMBOLS_REGEXP: /^.*?(?=[\^#%&$\*:<>\?/\{\|\}]).*$/g,
 }

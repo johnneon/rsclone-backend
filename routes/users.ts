@@ -20,9 +20,7 @@ authRouter.post('/register', checkMiddleware.checkRegister, async (req: Request,
       });
     }
 
-    const { password, email, fullName } = req.body;
-
-    const answer = await UserController.CreateUser({ password, email, fullName });
+    const answer = await UserController.CreateUser({ ...req.body });
 
     return res.status(201).json(answer);
   } catch (e) {
@@ -41,9 +39,9 @@ authRouter.post('/login', checkMiddleware.checkLogin, async (req: Request, res: 
       });
     }
 
-    const { email, password } = req.body;
+    const { password } = req.body;
 
-    const user: IUser = await UserController.SignIn({ email });
+    const user: IUser = await UserController.SignIn({ ...req.body });
 
     if (!user) {
       return res.status(404).json({ message: global.USER_NOT_FOUND });
