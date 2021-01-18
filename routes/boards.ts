@@ -39,6 +39,23 @@ boardRouter.get('/:id', auth, async (req: Request, res: Response) => {
   }
 });
 
+boardRouter.get('/all/:id', auth, async (req: Request, res: Response) => {
+  try {
+    const board: any = await Board.find({ users: { $in: [req.params.id] } });
+    console.log(board);
+
+    if (!board) {
+      return res.status(404).json({ message: global.BOARD_NOT_FOUND }); 
+    }
+
+    board.users = undefined;
+
+    return res.status(201).json(board);
+  } catch (e) {
+    return res.status(500).json({ message: global.RANDOM_ERROR });
+  }
+});
+
 boardRouter.put('/:id', auth, async (req: Request, res: Response) => {
   try {
     const { name } = req.body;
