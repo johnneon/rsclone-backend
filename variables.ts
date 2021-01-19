@@ -12,5 +12,7 @@ export default {
   COLUMN_NOT_FOUND: 'Can not find column!',
   LEFT_BOARD: 'You have successfully left the board!',
   DELETED_COLUMN: 'Column has been deleted!',
+  CARD_DELETED: 'Card has been deleted!',
+  CARD_NOT_FOUND: 'Card not found!',
   FORBIDDEN_SYMBOLS_REGEXP: /^.*?(?=[\^#%&$\*:<>\?/\{\|\}]).*$/g,
 }

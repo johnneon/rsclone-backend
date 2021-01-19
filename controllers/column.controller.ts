@@ -13,7 +13,6 @@ const CreateColumn = async ({ name, position, boardId }) => {
 }
 
 const GetColumn = async ({ id }) => {
-  console.log(id);
   const column: IColumn = await Column.findById(id).populate('cards');
 
   if (column) {

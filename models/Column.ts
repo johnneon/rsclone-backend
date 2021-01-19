@@ -5,7 +5,7 @@ export interface IColumn extends Document {
   name: string;
   position: number;
   boardId: string;
-  cards: Array<string>;
+  cards: Array<object>;
 }
 
 const ColumnSchema: Schema = new Schema({
