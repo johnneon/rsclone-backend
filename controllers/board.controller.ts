@@ -1,6 +1,5 @@
 import Board, { IBoard } from './../models/Board';
 import User, { IUser } from '../models/User';
-import global from '../variables';
 
 const CreateBoard = async ({ name, user }) => {
   return await Board
@@ -33,13 +32,62 @@ const GetFullBoard = async ({ id }) => {
   }
 };
 
-const UpdateBoard = async ({}) => {};
+const GetAllBoards = async ({ userId }) => {
+  const boards: any = await Board.find({ users: { $in: [ userId ] } });
 
-const DeleteBoard = async ({}) => {};
+  boards.map((board) => {
+    board.users = undefined;
+    board.columns = undefined;
+  });
+
+  return boards;
+};
+
+const UpdateBoard = async ({ name, _id}) => {
+  const board: IBoard = await Board.findOneAndUpdate({ _id }, { name });
+
+  if (board) {
+    const updatedBoard: IBoard = await Board.findById({ _id });
+      
+    updatedBoard.users = undefined;
+    updatedBoard.columns = undefined;
+
+    return updatedBoard;
+  }
+};
+
+const DeleteBoard = async ({ _id, userId }) => {
+  const board: IBoard = await Board.findOne({ _id }, async (err, Board) => {
+    if (err) {
+      throw err;
+    }
+
+    const { users } = Board;
+
+    const user = users.indexOf(userId);
+
+    if (user !== -1) {
+      users.splice(user, 1);
+    }
+
+    if (Board.users.length === 0) {
+      Board.delete();
+    }
+  });
+
+  if (board) {
+    await User.updateOne(
+      { _id: userId },
+      { $pull: { boards: _id } }
+    );
+    return board;
+  }
+};
 
 export default {
   CreateBoard,
   GetFullBoard,
+  GetAllBoards,
   UpdateBoard,
   DeleteBoard
 };

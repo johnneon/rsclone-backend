@@ -11,6 +11,7 @@ export default ({uri}: TInput) => {
         useNewUrlParser: true,
         useUnifiedTopology: true,
         useCreateIndex: true,
+        useFindAndModify: false,
       });
     } catch (e) {
       console.warn(e.message);

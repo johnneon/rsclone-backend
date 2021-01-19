@@ -1,5 +1,4 @@
-import { Request, Response } from 'express';
-import { check, validationResult } from 'express-validator';
+import { check } from 'express-validator';
 import global from '../variables';
 
 const checkRegister = [
