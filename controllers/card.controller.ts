@@ -6,6 +6,7 @@ const CreateCard = async ({ name, position, columnId }) => {
   return await Card
     .create({ name, position, columnId })
     .then( async (card: ICard) => {
+      console.log(card._id)
       await Column.updateOne( { _id: columnId }, { $push: { cards: { _id: card._id } } });
       return card;
     })

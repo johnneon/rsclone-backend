@@ -19,7 +19,10 @@ const GetFullBoard = async ({ id }) => {
     }
   }
 
-  const board: IBoard = await Board.findById(id).populate(boardPopulate);
+  const board: IBoard = await Board
+    .findById(id)
+    .populate(boardPopulate)
+    .populate('users');
 
   if (board) {
     const { users } = board;
