@@ -190,7 +190,9 @@ url: /api/board/
 method: GET
 headers: { Content-Type: application/json, Authorization: Bearer TOKEN } // Вместо TOKEN, вставляем код с поля token которое приходит при авторизации
 ```
+
 Ответ при успешном запросе:
+```json
 [
     {
         "_id": "6006c799da791d16982dfea5",
@@ -205,7 +207,7 @@ headers: { Content-Type: application/json, Authorization: Bearer TOKEN } // Вм
         "name": "Board - 4"
     }
 ]
-
+```
  
  ### Обновление имени доски
  ```
