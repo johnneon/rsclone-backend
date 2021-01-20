@@ -98,7 +98,7 @@ body: { login, password }
     "message": "Type of name must be string!"
 }
 ```
-## Работа с досками
+## Вожно!!!
 Далее для работы с досками/колонками/карточками необходимо отправлять токен в заголовках запроса, опишу в полях запроса ниже.
 
 Так же если токен умер прилетает ошибка:
@@ -107,6 +107,7 @@ body: { login, password }
     "message": "You are not authorized!"
 }
 ```
+## Работа с досками
 
 ### Создание доски
 Опции запроса для авторизации:
@@ -245,3 +246,201 @@ headers: { Content-Type: application/json, Authorization: Bearer TOKEN } // Вм
 ```
 
 ## Работа с колонками
+### Создание колонки
+boardId это id доски в которой создается колонка, параметр обязателен! Так же поле position - это порядковое поле позиции колонки, так же обязательно! Опции запроса для авторизации:
+```
+url: /api/column/
+method: POST
+headers: { Content-Type: application/json, Authorization: Bearer TOKEN } // Вместо TOKEN, вставляем код с поля token которое приходит при авторизации
+body: { name, boardIdб position }
+```
+Ответ при успешном создании доски:
+```json
+{
+    "position": 0,
+    "cards": [],
+    "_id": "6007e350d1e5955028369500",
+    "name": "Column - 1. Board - 3",
+    "boardId": "6006c79dda791d16982dfea6"
+}
+```
+Возможные ошибки:
+```json
+{
+    "message": "Can not find board!"
+}
+```
+```json
+{
+    "message": "The name can not contain invalid characters!"
+}
+```
+
+### Получение колонки со всеми данными в ней
+Вместо `/:id` подставляем id так `/api/board/6007e350d1e5955028369500` (пример).
+```
+url: /api/board/:id
+method: GET
+headers: { Content-Type: application/json, Authorization: Bearer TOKEN } // Вместо TOKEN, вставляем код с поля token которое приходит при авторизации
+```
+Ответ при успешном получении доски:
+
+```json
+{
+    "position": 0,
+    "cards": [
+        {
+            "position": 0,
+            "_id": "6007e3b6d1e5955028369501",
+            "name": "Card - 1. Column - 0.Board - 3.",
+            "columnId": "6007e350d1e5955028369500"
+        }
+    ],
+    "_id": "6007e350d1e5955028369500",
+    "name": "Column - 1. Board - 3",
+    "boardId": "6006c79dda791d16982dfea6"
+}
+```
+Возможные ошибки:
+```json
+{
+    "message": "Can not find column!"
+}
+```
+
+ ### Обновление имени колонки
+ ```
+url: /api/column/:id
+method: PUT
+headers: { Content-Type: application/json, Authorization: Bearer TOKEN } // Вместо TOKEN, вставляем код с поля token которое приходит при авторизации
+body: { name }
+{
+    "position": 0,
+    "cards": [
+        "6007e3b6d1e5955028369501"
+    ],
+    "_id": "6007e350d1e5955028369500",
+    "name": "Column - 1.1. Board - 2",
+    "boardId": "6006c79dda791d16982dfea6"
+}
+```
+
+### Удаление колонки
+
+ ```
+url: /api/column/:id
+method: DELETE
+headers: { Content-Type: application/json, Authorization: Bearer TOKEN } // Вместо TOKEN, вставляем код с поля token которое приходит при авторизации
+```
+При успешном покидании доски ответ будет таким:
+```json
+{
+    "message": "Column has been deleted!"
+}
+```
+Возможные ошибки:
+```json
+{
+    "message": "Can not find column!"
+}
+```
+
+## Работа с карточкам (Не закончил описание доков)
+### Создание колонки
+boardId это id доски в которой создается колонка, параметр обязателен! Так же поле position - это порядковое поле позиции колонки, так же обязательно! Опции запроса для авторизации:
+```
+url: /api/column/
+method: POST
+headers: { Content-Type: application/json, Authorization: Bearer TOKEN } // Вместо TOKEN, вставляем код с поля token которое приходит при авторизации
+body: { name, boardIdб position }
+```
+Ответ при успешном создании доски:
+```json
+{
+    "position": 0,
+    "cards": [],
+    "_id": "6007e350d1e5955028369500",
+    "name": "Column - 1. Board - 3",
+    "boardId": "6006c79dda791d16982dfea6"
+}
+```
+Возможные ошибки:
+```json
+{
+    "message": "Can not find board!"
+}
+```
+```json
+{
+    "message": "The name can not contain invalid characters!"
+}
+```
+
+### Получение колонки со всеми данными в ней
+Вместо `/:id` подставляем id так `/api/board/6007e350d1e5955028369500` (пример).
+```
+url: /api/board/:id
+method: GET
+headers: { Content-Type: application/json, Authorization: Bearer TOKEN } // Вместо TOKEN, вставляем код с поля token которое приходит при авторизации
+```
+Ответ при успешном получении доски:
+
+```json
+{
+    "position": 0,
+    "cards": [
+        {
+            "position": 0,
+            "_id": "6007e3b6d1e5955028369501",
+            "name": "Card - 1. Column - 0.Board - 3.",
+            "columnId": "6007e350d1e5955028369500"
+        }
+    ],
+    "_id": "6007e350d1e5955028369500",
+    "name": "Column - 1. Board - 3",
+    "boardId": "6006c79dda791d16982dfea6"
+}
+```
+Возможные ошибки:
+```json
+{
+    "message": "Can not find column!"
+}
+```
+
+ ### Обновление имени колонки
+ ```
+url: /api/column/:id
+method: PUT
+headers: { Content-Type: application/json, Authorization: Bearer TOKEN } // Вместо TOKEN, вставляем код с поля token которое приходит при авторизации
+body: { name }
+{
+    "position": 0,
+    "cards": [
+        "6007e3b6d1e5955028369501"
+    ],
+    "_id": "6007e350d1e5955028369500",
+    "name": "Column - 1.1. Board - 2",
+    "boardId": "6006c79dda791d16982dfea6"
+}
+```
+
+### Удаление колонки
+
+ ```
+url: /api/column/:id
+method: DELETE
+headers: { Content-Type: application/json, Authorization: Bearer TOKEN } // Вместо TOKEN, вставляем код с поля token которое приходит при авторизации
+```
+При успешном покидании доски ответ будет таким:
+```json
+{
+    "message": "Column has been deleted!"
+}
+```
+Возможные ошибки:
+```json
+{
+    "message": "Can not find column!"
+}
+```
