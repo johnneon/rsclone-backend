@@ -13,6 +13,6 @@ export default {
   LEFT_BOARD: 'You have successfully left the board!',
   DELETED_COLUMN: 'Column has been deleted!',
   CARD_DELETED: 'Card has been deleted!',
-  CARD_NOT_FOUND: 'Card not found!',
+  CARD_NOT_FOUND: 'Can not find card!',
   FORBIDDEN_SYMBOLS_REGEXP: /^.*?(?=[\^#%&$\*:<>\?/\{\|\}]).*$/g,
 }
