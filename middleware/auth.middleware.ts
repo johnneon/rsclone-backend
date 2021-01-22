@@ -19,6 +19,17 @@ export default (req: Request, res: Response, next: NextFunction) => {
     req.body.user = decoded;
     next();
   } catch (e) {
-    res.status(401).json({ message: global.NOT_AUTHORIZED });
+    if (e.name === 'TokenExpiredError') {
+      return res
+        .status(401)
+        .json({ message: global.SESSION_OUT });
+    } else if (e.name === 'JsonWebTokenError') {
+      return res
+        .status(401)
+        .json({ message: global.INVALID_TOKEN });
+    } else {
+      console.error(e);
+      return res.status(400).json({ message: e });
+    }
   }
 }

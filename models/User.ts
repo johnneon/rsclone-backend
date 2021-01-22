@@ -1,12 +1,11 @@
-import { IBoard } from './Board';
 import { Schema, model, Types, Document } from 'mongoose';
-
 export interface IUser extends Document {
   email: string;
   password: string;
   fullName: string;
   boards: Array<object>;
   token?: string;
+  refreshToken?: string;
   userId?: string;
   _id?: string;
 }

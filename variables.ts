@@ -6,6 +6,8 @@ export default {
   INCORECT_EMAIL: 'Incorect email!',
   INCORECT_DATA: 'Incorect data!',
   NOT_AUTHORIZED: 'You are not authorized!',
+  SESSION_OUT: 'Session timed out,please login again',
+  INVALID_TOKEN: 'Invalid token,please login again!',
   TYPE_STRING: 'Type of name must be string!',
   INCORECT_CHARTS: 'The name can not contain invalid characters!',
   BOARD_NOT_FOUND: 'Can not find board!',
