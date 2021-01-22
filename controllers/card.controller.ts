@@ -21,22 +21,14 @@ const GetCard = async ({ id }) => {
   }
 };
 
-const UpdateCard = async ({ name, position, content, column, id }) => {
+const UpdateCard = async ({ name, position, content, columnId, id }) => {
     const card: ICard = await Card.findById(id);
 
     if (name) {
       card.name = name;
     }
 
-    if (position || position === 0) {
-      card.position = position;
-    }
-
-    if (content) {
-      card.content = content;
-    }
-
-    if (column) {
+    if (columnId && position) {
       const prevColumn = card.columnId;
       
       await Column.updateOne(
@@ -45,11 +37,61 @@ const UpdateCard = async ({ name, position, content, column, id }) => {
       );
 
       await Column.updateOne(
-        { _id: column },
+        { _id: columnId },
         { $push: { cards: id } }
       );
 
-      card.columnId = column;
+      const cards = await Card.find({ boardId: card.columnId });
+      cards.sort((a, b) => a.position - b.position);
+
+      const currentPos = card.position;
+      const desiredPos = position;
+      const operation = cards.splice(currentPos, 1);
+      cards.splice(desiredPos, 0, ...operation);
+      cards.forEach((el, ind) => el.position = ind );
+    
+      const bulkArr = [];
+    
+      for (const input of cards) {
+        bulkArr.push({
+          updateOne: {
+            filter: { _id: input._id },
+            update: { position: input.position }
+          }
+        });
+      }
+    
+      await Card.bulkWrite(bulkArr);
+
+      card.columnId = columnId;
+    } else if (position || position === 0) {
+      const cards = await Card.find({ boardId: card.columnId });
+      cards.sort((a, b) => a.position - b.position);
+
+      const currentPos = card.position;
+      const desiredPos = position;
+      const operation = cards.splice(currentPos, 1);
+      cards.splice(desiredPos, 0, ...operation);
+      cards.forEach((el, ind) => el.position = ind );
+    
+      const bulkArr = [];
+    
+      for (const input of cards) {
+        bulkArr.push({
+          updateOne: {
+            filter: { _id: input._id },
+            update: { position: input.position }
+          }
+        });
+      }
+    
+      await Card.bulkWrite(bulkArr);
+
+      card.position = position;
+    }
+
+    if (content) {
+      card.content = content;
     }
 
     card.save();
