@@ -308,12 +308,15 @@ headers: { Content-Type: application/json, Authorization: Bearer TOKEN } // Вм
 }
 ```
 
- ### Обновление имени колонки
+ ### Обновление колонки
  ```
 url: /api/column/:id
 method: PUT
 headers: { Content-Type: application/json, Authorization: Bearer TOKEN } // Вместо TOKEN, вставляем код с поля token которое приходит при авторизации
-body: { name }
+body: { name, position }
+```
+Пи успешном обновлении ответ будет таким:
+```json
 {
     "position": 0,
     "cards": [
@@ -322,6 +325,12 @@ body: { name }
     "_id": "6007e350d1e5955028369500",
     "name": "Column - 1.1. Board - 2",
     "boardId": "6006c79dda791d16982dfea6"
+}
+```
+Возможные ошибки:
+```json
+{
+    "message": "Can not find column!"
 }
 ```
 
