@@ -119,7 +119,7 @@ const GetNewToken = async (req: Request, res: Response) => {
 
     const accessToken = jwt.sign({ userId: payload['userId'] }, secret, { expiresIn: '4h' });
 
-    return res.status(200).json({ token: accessToken });
+    return res.status(200).json({ token: accessToken, userId: payload['userId'] });
   } catch (e) {
     if (e.name === global.TOKEN_EXPIRED_ERROR) {
       const { refreshToken } = req.body;
