@@ -71,8 +71,8 @@ const SignIn = async (req: Request, res: Response) => {
     const secret = process.env.JWT_SECRET || 'protectedone';
     const refreshSecret = process.env.REFRESH_JWT_SECRET || 'protecteuptodate';
     
-    const token = jwt.sign({ userId: user.userId }, secret, { expiresIn: '10m' });
-    const refreshToken = jwt.sign({ userId: user.userId }, refreshSecret, { expiresIn: '1d' });
+    const token = jwt.sign({ userId: user.userId }, secret, { expiresIn: '4h' });
+    const refreshToken = jwt.sign({ userId: user.userId }, refreshSecret, { expiresIn: '7d' });
 
     await RefreshToken.create({ userId: user.userId, refreshToken });
 
@@ -117,7 +117,7 @@ const GetNewToken = async (req: Request, res: Response) => {
 
     const payload = jwt.verify(token.refreshToken, refreshSecret);
 
-    const accessToken = jwt.sign({ userId: payload['userId'] }, secret, { expiresIn: '10m' });
+    const accessToken = jwt.sign({ userId: payload['userId'] }, secret, { expiresIn: '4h' });
 
     return res.status(200).json({ token: accessToken });
   } catch (e) {
