@@ -4,7 +4,7 @@ import { Request, Response, NextFunction } from 'express';
 import global from '../variables';
 
 export default (req: Request, res: Response, next: NextFunction) => {
-  if (req.method === 'OPTIONS') {
+  if (req.method === global.METHOD_OPTIONS) {
     return next();
   }
 
@@ -19,11 +19,11 @@ export default (req: Request, res: Response, next: NextFunction) => {
     req.body.user = decoded;
     next();
   } catch (e) {
-    if (e.name === 'TokenExpiredError') {
+    if (e.name === global.TOKEN_EXPIRED_ERROR) {
       return res
         .status(401)
         .json({ message: global.SESSION_OUT });
-    } else if (e.name === 'JsonWebTokenError') {
+    } else if (e.name === global.WEB_TOKEN_ERROR) {
       return res
         .status(401)
         .json({ message: global.INVALID_TOKEN });

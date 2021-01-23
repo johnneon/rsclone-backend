@@ -98,17 +98,73 @@ body: { login, password }
     "message": "Type of name must be string!"
 }
 ```
-## Вожно!!!
-Далее для работы с досками/колонками/карточками необходимо отправлять токен в заголовках запроса, опишу в полях запроса ниже.
 
-Так же если токен умер прилетает ошибка:
+### JWT Token
+
+Далее для работы с досками/колонками/карточками необходимо отправлять токен в заголовках запроса, опишу в полях запроса ниже.
+Так же будет присутствовать специальный 'Refresh Token', для обновления 'Access token'а, жизнь токена для получания данных 4 часа.
+Жизнь рефреш токена 7 дней.
+
+Если токен отсутствует в заголовках, то получаем такую ошибку:
 ```json
 {
     "message": "You are not authorized!"
 }
 ```
-## Работа с досками
 
+Если получили ошибку:
+```json
+{
+    "message": "Session timed out,please login again!"
+}
+```
+Это означает что рефреш токен уже мертв, и нужно авторизироваться повторно.
+Итак, когда у нас уже умер Access token, нам нужно его обновить, для этого отправляем такой запрос:
+```
+url: /api/auth/refresh_token
+method: POST
+headers: { Content-Type: application/json } приходит при авторизации
+body: { refreshToken }
+```
+Где поле `refreshToken` - и является вашим рефреш токеном, и если запрос проходит успешно, то мы получаем новый токен:
+```json
+{
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2MDA2YmYyZjFkOGY5MDEzYmVkN2FiMGIiLCJpYXQiOjE2MTEzOTU2MjQsImV4cCI6MTYxMTQ4MjAyNH0.VxqiQz8f9F1HqE38tLhtjIOn7yGUidgoInYOixz7HAw"
+}
+```
+При передачи неверного рефреш токена получим:
+```json
+{
+    "message": "Invalid token,please login again!"
+}
+```
+Если токен не был отправлен:
+```json
+{
+    "message": "Access denied,token missing!"
+}
+```
+И если рефреш токен тоже мертв:
+```json
+{
+    "message": "Token expired!"
+}
+```
+### Выход с аккаунта
+При выходе с аккаунта нужно передовать такой запрос:
+```
+url: /api/auth/logout
+method: DELTE
+headers: { Content-Type: application/json } приходит при авторизации
+body: { userId }
+```
+Это сделанно для того что бы деактивировать рефреш токен на сервере. При успешном выходе получаем ответ:
+```json
+{
+    "message": "User logged out!"
+}
+```
+## Работа с досками
 ### Создание доски
 Опции запроса для авторизации:
 ```

@@ -25,10 +25,10 @@ const CreateUser = async (req: Request, res: Response) => {
       const user =  await User
         .create({ email, password: hashedPassword, fullName })
         .then(() => {
-          return { message: 'User created!' };
+          return { message: global.USER_CREATED };
         })
         .catch(() => {
-          return { message: 'This user has been registered!' };
+          return { message: global.REGISTRED_USER_ERROR };
         });
       
       if (user) {
@@ -66,15 +66,15 @@ const SignIn = async (req: Request, res: Response) => {
 
     user.userId = user._id;
 
-    await RefreshToken.findOneAndDelete({ email }); // прочекать !!!
+    await RefreshToken.findOneAndDelete({ userId: user.userId });
 
     const secret = process.env.JWT_SECRET || 'protectedone';
     const refreshSecret = process.env.REFRESH_JWT_SECRET || 'protecteuptodate';
     
-    const token = jwt.sign({ userId: user._id }, secret, { expiresIn: '10m' });
-    const refreshToken = jwt.sign({ userId: user._id }, refreshSecret, { expiresIn: '1d' });
+    const token = jwt.sign({ userId: user.userId }, secret, { expiresIn: '10m' });
+    const refreshToken = jwt.sign({ userId: user.userId }, refreshSecret, { expiresIn: '1d' });
 
-    await RefreshToken.create({ email, refreshToken });
+    await RefreshToken.create({ userId: user.userId, refreshToken });
 
     user.refreshToken = refreshToken;
     user.token = token;
@@ -93,6 +93,7 @@ const SignIn = async (req: Request, res: Response) => {
       userId: user._id
     });
   } catch (e) {
+    console.log(e);
     return res.status(500).json({ message: global.RANDOM_ERROR });
   }
 }
@@ -102,13 +103,13 @@ const GetNewToken = async (req: Request, res: Response) => {
     const { refreshToken } = req.body;
 
     if (!refreshToken) {
-      return res.status(403).json({ error: "Access denied,token missing!" });
+      return res.status(403).json({ message: global.MISSING_TOKEN });
     }
 
     const token: IToken = await RefreshToken.findOne({ refreshToken });
 
     if (!token) {
-      return res.status(401).json({ error: "Token expired!" });
+      return res.status(401).json({ message: global.TOKEN_EXPIRED });
     }
 
     const secret = process.env.JWT_SECRET || 'protectedone';
@@ -116,19 +117,39 @@ const GetNewToken = async (req: Request, res: Response) => {
 
     const payload = jwt.verify(token.refreshToken, refreshSecret);
 
-    if (!payload) {
-
-    }
-
     const accessToken = jwt.sign({ userId: payload['userId'] }, secret, { expiresIn: '10m' });
 
     return res.status(200).json({ token: accessToken });
   } catch (e) {
-    return res.status(500).json({ message: global.RANDOM_ERROR });
+    if (e.name === global.TOKEN_EXPIRED_ERROR) {
+      const { refreshToken } = req.body;
+
+      await RefreshToken.findOneAndDelete({ refreshToken });
+
+      return res
+        .status(401)
+        .json({ message: global.TOKEN_EXPIRED });
+    } else if (e.name === global.WEB_TOKEN_ERROR) {
+      return res
+        .status(401)
+        .json({ message: global.INVALID_TOKEN });
+    } else {
+      return res.status(500).json({ message: global.RANDOM_ERROR });
+    }
   }
 };
 
-const LogOut = async (req: Request, res: Response) => {};
+const LogOut = async (req: Request, res: Response) => {
+  try {
+    const { userId } = req.body;
+
+    await RefreshToken.findOneAndDelete({ userId });
+
+    return res.status(200).json({ message: global.USER_LOGOUT });
+  } catch (e) {
+    return res.status(500).json({ message: global.RANDOM_ERROR });
+  }
+};
 
 export default {
   CreateUser,
