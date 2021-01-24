@@ -28,7 +28,6 @@ const CreateCard = async (req: Request, res: Response) => {
     const card = await Card
       .create({ name, position: cardPosition, columnId })
       .then( async (card: ICard) => {
-        console.log(card._id)
         await Column.updateOne( { _id: columnId }, { $push: { cards: { _id: card._id } } });
         return card;
       })
@@ -76,7 +75,6 @@ const UpdateCard = async (req: Request, res: Response) => {
 
     const sortCards = async (cards: Array<ICard>) => {
       cards.forEach((el, ind) => el.position = ind );
-      console.log(cards);
     
       const bulkArr = [];
     
@@ -152,8 +150,14 @@ const UpdateCard = async (req: Request, res: Response) => {
     }
 
     if (columnId) {
-      await changeColumn();
-    } else if (position || position === 0) {
+      if (columnId.toString() !== card.columnId.toString()) {
+        console.log(columnId, card.columnId)
+        await changeColumn();
+      } else {
+        await changePosition();
+      }
+    }
+    if ((position || position === 0) && !columnId) {
       await changePosition();
     }
 
