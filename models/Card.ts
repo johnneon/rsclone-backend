@@ -10,7 +10,6 @@ export interface ICard extends Document {
 
 const CardSchema: Schema = new Schema({
   name: { type: String, required: true },
-  position: { type: Number, default: 0 },
   columnId: { type: Types.ObjectId, ref: 'Column' },
   content: { type: String }
 }, {

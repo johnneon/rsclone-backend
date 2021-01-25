@@ -1,79 +1,134 @@
+import { Request, Response } from 'express';
 import Column, { IColumn } from './../models/Column';
 import Board, { IBoard } from './../models/Board';
 import Card from '../models/Card';
+import global from '../variables';
 
-const CreateColumn = async ({ name, position, boardId }) => {
-  return await Column
-    .create({ name, position, boardId })
-    .then( async (column: IColumn) => {
-      await Board.updateOne( { _id: boardId }, { $push: { columns: { _id: column._id } } });
-      return column;
-    })
-    .catch((err) => err);
+const CreateColumn = async (req: Request, res: Response) => {
+  try {
+    const { name, boardId } = req.body;
+
+    const check = global.FORBIDDEN_SYMBOLS_REGEXP;
+  
+    if (check.test(name)) {
+      return res.status(400).json({ message: global.INCORECT_CHARTS });
+    }
+  
+    if (!boardId) {
+      return res.status(404).json({ message: global.BOARD_NOT_FOUND });
+    }
+  
+    const column =  await Column
+      .create({ name, boardId })
+      .then( async (column: IColumn) => {
+        await Board.updateOne( { _id: boardId }, { $push: { columns: column._id } });
+        return column;
+      })
+      .catch((err) => err);
+
+    return res.status(201).json(column);
+  } catch (e) {
+    return res.status(500).json({ message: global.RANDOM_ERROR });
+  }
 }
 
-const GetColumn = async ({ id }) => {
-  const column: IColumn = await Column.findById(id).populate('cards');
+const GetColumn = async (req: Request, res: Response) => {
+  try {
+    const column: IColumn = await Column.findById(req.params.id).populate('cards');
 
-  if (column) {
-    return column;
+    if (!column) {
+      return res.status(404).json({ message: global.COLUMN_NOT_FOUND });
+    }
+
+    return res.status(201).json(column);
+  } catch (e) {
+    return res.status(500).json({ message: global.RANDOM_ERROR });
   }
 };
 
-const UpdateColumn = async ({ id, name, position }) => {
-  const column: IColumn = await Column.findById(id);
+const UpdateColumn = async (req: Request, res: Response) => {
+  try {
+    const { name, position } = req.body;
+    const { id } = req.params;
 
-  if (column) {
+    if (name) {
+      const check = global.FORBIDDEN_SYMBOLS_REGEXP;
+
+      if (check.test(name)) {
+        return res.status(400).json({ message: global.INCORECT_CHARTS });
+      }
+    }
+
+    const column: IColumn = await Column.findById(id);
+
+    if (!column) {
+      return res.status(404).json({ message: global.COLUMN_NOT_FOUND });
+    }
 
     if (name) {
       column.name = name;
     }
-    
+
     if (position || position === 0) {
-      const columns = await Column.find({ boardId: column.boardId });
-      columns.sort((a, b) => a.position - b.position);
+      console.log('got here');
+      const board: IBoard = await Board.findById(column.boardId);
 
-      const currentPos = column.position;
-      const desiredPos = position;
-      const operation = columns.splice(currentPos, 1);
-      columns.splice(desiredPos, 0, ...operation);
-      columns.forEach((el, ind) => el.position = ind );
-    
-      const bulkArr = [];
-    
-      for (const input of columns) {
-        bulkArr.push({
-          updateOne: {
-            filter: { _id: input._id },
-            update: { position: input.position }
-          }
-        });
+      if (!board) {
+        return res.status(404).json({ message: global.BOARD_NOT_FOUND });
       }
-    
-      await Column.bulkWrite(bulkArr);
 
-      column.position = position;
+      if (position > board.columns.length || position < 0) {
+        return res.status(400).json({ message: global.INCORECT_POSITION });
+      }
+
+      const pasteColumn = {
+        $push: {
+          columns: {
+             $each: [ id ],
+             $position: position
+          }
+        }
+      };
+
+      const deleteColumn = {
+        $pull: { columns: id }
+      };
+
+      const boardId = { _id: column.boardId };
+
+      await Board.findOneAndUpdate(boardId, deleteColumn).catch((e) => e);
+
+      await Board.findOneAndUpdate(boardId, pasteColumn).catch((e) => e);
+      
     }
-
-    return column;
+  
+    return res.status(201).json(column);
+  } catch (e) {
+    return res.status(500).json({ message: global.RANDOM_ERROR });
   }
 };
 
-const DeleteColumn = async ({ id }) => {
-  const column: IColumn = await Column.findByIdAndDelete(id);
+const DeleteColumn = async (req: Request, res: Response) => {
+  try {
+    const column: IColumn = await Column.findByIdAndDelete(req.params.id);
 
-  if (column) {
+    if (!column) {
+      return res.status(400).json({ message: global.COLUMN_NOT_FOUND });
+    }
+
     await Board.updateOne(
       { _id: column.boardId },
       {
         $pull: { columns: column._id }
       }
     );
-  
-    await Card.deleteMany({ column: column._id });
-    return column;
-  }
 
+    await Card.deleteMany({ column: column._id });
+
+    return res.status(201).json({ message: global.DELETED_COLUMN });
+  } catch (e) {
+    return res.status(500).json({ message: global.RANDOM_ERROR });
+  }
 };
 
 export default {

@@ -10,7 +10,6 @@ export interface IColumn extends Document {
 
 const ColumnSchema: Schema = new Schema({
   name: { type: String, required: true, unique: false },
-  position: { type: Number, default: 0, unique: false },
   boardId: { type: Types.ObjectId, ref: 'Board' },
   cards: [{type: Types.ObjectId, ref: 'Card'}]
 }, {

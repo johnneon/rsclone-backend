@@ -17,16 +17,8 @@ const CreateCard = async (req: Request, res: Response) => {
       return res.status(400).json({ message: global.COLUMN_NOT_FOUND });
     }
 
-    const cards = await Card.find({ columnId });
-
-    let cardPosition: number = 0;
-
-    if (cards.length) {
-      cardPosition = cards.length;
-    }
-  
     const card = await Card
-      .create({ name, position: cardPosition, columnId })
+      .create({ name, columnId })
       .then( async (card: ICard) => {
         await Column.updateOne( { _id: columnId }, { $push: { cards: { _id: card._id } } });
         return card;
@@ -87,6 +79,10 @@ const UpdateCard = async (req: Request, res: Response) => {
         return res.status(404).json({ message: global.COLUMN_NOT_FOUND });
       }
 
+      if (position > column.cards.length || position < 0) {
+        return res.status(400).json({ message: global.INCORECT_POSITION });
+      }
+
       const pasteCard = {
         $push: {
           cards: {
@@ -100,15 +96,15 @@ const UpdateCard = async (req: Request, res: Response) => {
         $pull: { cards: id }
       };
 
-      const changingColumnId = (prevColumn.toString() === currentColumn.toString())
+      const outsideColumn = (prevColumn.toString() === currentColumn.toString())
       ? { _id: currentColumn }
       : { _id: prevColumn };
       
-      const staticColumnById = { _id: currentColumn };
+      const insideColumn = { _id: currentColumn };
 
-      await Column.findOneAndUpdate(changingColumnId, deleteCard).catch((e) => e);
+      await Column.findOneAndUpdate(outsideColumn, deleteCard).catch((e) => e);
   
-      await Column.findOneAndUpdate(staticColumnById, pasteCard).catch((e) => e);
+      await Column.findOneAndUpdate(insideColumn, pasteCard).catch((e) => e);
     
       card.columnId = currentColumn;
     }

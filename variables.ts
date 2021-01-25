@@ -19,6 +19,7 @@ export default {
   DELETED_COLUMN: 'Column has been deleted!',
   CARD_DELETED: 'Card has been deleted!',
   CARD_NOT_FOUND: 'Can not find card!',
+  INCORECT_POSITION: 'Incorect position!',
   FORBIDDEN_SYMBOLS_REGEXP: /^.*?(?=[\^#%&$\*:<>\?/\{\|\}]).*$/g,
   TOKEN_EXPIRED_ERROR: 'TokenExpiredError',
   WEB_TOKEN_ERROR: 'JsonWebTokenError',
