@@ -303,17 +303,16 @@ headers: { Content-Type: application/json, Authorization: Bearer TOKEN } // Вм
 
 ## Работа с колонками
 ### Создание колонки
-boardId это id доски в которой создается колонка, параметр обязателен! Так же поле position - это порядковое поле позиции колонки, так же обязательно! Опции запроса для авторизации:
+boardId это id доски в которой создается колонка, параметр обязателен! Опции запроса для авторизации:
 ```
 url: /api/column/
 method: POST
 headers: { Content-Type: application/json, Authorization: Bearer TOKEN } // Вместо TOKEN, вставляем код с поля token которое приходит при авторизации
-body: { name, boardId, position }
+body: { name, boardId }
 ```
 Ответ при успешном создании доски:
 ```json
 {
-    "position": 0,
     "cards": [],
     "_id": "6007e350d1e5955028369500",
     "name": "Column - 1. Board - 3",
@@ -343,10 +342,8 @@ headers: { Content-Type: application/json, Authorization: Bearer TOKEN } // Вм
 
 ```json
 {
-    "position": 0,
     "cards": [
         {
-            "position": 0,
             "_id": "6007e3b6d1e5955028369501",
             "name": "Card - 1. Column - 0.Board - 3.",
             "columnId": "6007e350d1e5955028369500"
@@ -365,6 +362,7 @@ headers: { Content-Type: application/json, Authorization: Bearer TOKEN } // Вм
 ```
 
  ### Обновление колонки
+При обновлении позиции калонку, меняется ее место в массиве колонок в доске.
  ```
 url: /api/column/:id
 method: PUT
@@ -374,7 +372,6 @@ body: { name, position }
 Пи успешном обновлении ответ будет таким:
 ```json
 {
-    "position": 0,
     "cards": [
         "6007e3b6d1e5955028369501"
     ],
@@ -410,19 +407,18 @@ headers: { Content-Type: application/json, Authorization: Bearer TOKEN } // Вм
 }
 ```
 
-## Работа с карточкам (Не закончил описание доков)
+## Работа с карточкам
 ### Создание карточки
-boardId это id доски в которой создается колонка, параметр обязателен! Так же поле position - это порядковое поле позиции колонки, так же обязательно! Опции запроса для авторизации:
+columnId это id колонки в которой создается карточка, параметр обязателен! Опции запроса для авторизации:
 ```
 url: /api/cards/
 method: POST
 headers: { Content-Type: application/json, Authorization: Bearer TOKEN } // Вместо TOKEN, вставляем код с поля token которое приходит при авторизации
-body: { name, columnId, position }
+body: { name, columnId }
 ```
-Ответ при успешном создании доски:
+Ответ при успешном создании карточки:
 ```json
 {
-    "position": 0,
     "_id": "6007e350d1e5955028369500",
     "name": "Card - 1. Column - 1",
     "columnId": "6006c79dda791d16982dfea6"
@@ -441,7 +437,7 @@ body: { name, columnId, position }
 ```
 
 ### Получение карточки со всеми данными в ней
-Вместо `/:id` подставляем id так `/api/board/6007e350d1e5955028369500` (пример).
+Вместо `/:id` подставляем id так `/api/cards/6007e350d1e5955028369500` (пример).
 ```
 url: /api/cards/:id
 method: GET
@@ -451,7 +447,6 @@ headers: { Content-Type: application/json, Authorization: Bearer TOKEN } // Вм
 
 ```json
 {
-    "position": 0,
     "_id": "6007d49c0c3d1f49a7fe1cec",
     "name": "Card - 1. Column - 0.Board - 2.",
     "columnId": "6006d1ec6fd4c32099773add"
@@ -465,14 +460,13 @@ headers: { Content-Type: application/json, Authorization: Bearer TOKEN } // Вм
 ```
 
  ### Обновление карточки
- Поля не обязательные, но должно присутствовать хотя бы одно. Если нам нужно сменить калонку, то передаем в columnId - id той колонки в которую перемещаем карточку.
+Поля не обязательные, но должно присутствовать хотя бы одно. Для смены позиции карточки, обязательно должны присутствовать поля columnId и position!
  ```
 url: /api/cards/:id
 method: PUT
 headers: { Content-Type: application/json, Authorization: Bearer TOKEN } // Вместо TOKEN, вставляем код с поля token которое приходит при авторизации
 body: { name, position, content, columnId }
 {
-    "position": 0,
     "_id": "6007d49c0c3d1f49a7fe1cec",
     "name": "new name",
     "columnId": "6006d1ec6fd4c32099773add",
