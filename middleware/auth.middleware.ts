@@ -22,7 +22,7 @@ export default (req: Request, res: Response, next: NextFunction) => {
     if (e.name === global.TOKEN_EXPIRED_ERROR) {
       return res
         .status(401)
-        .json({ message: global.SESSION_OUT });
+        .json({ message: global.TOKEN_EXPIRED });
     } else if (e.name === global.WEB_TOKEN_ERROR) {
       return res
         .status(401)

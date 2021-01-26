@@ -128,7 +128,7 @@ const GetNewToken = async (req: Request, res: Response) => {
 
       return res
         .status(401)
-        .json({ message: global.TOKEN_EXPIRED });
+        .json({ message: global.SESSION_OUT });
     } else if (e.name === global.WEB_TOKEN_ERROR) {
       return res
         .status(401)
