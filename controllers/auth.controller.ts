@@ -52,7 +52,7 @@ const SignIn = async (req: Request, res: Response) => {
 
     const { email, password } = req.body;
 
-    const user: IUser = await User.findOne({ email }).populate('boards');
+    const user: IUser = await User.findOne({ email });
 
     if (!user) {
       return res.status(404).json({ message: global.USER_NOT_FOUND });
@@ -79,10 +79,7 @@ const SignIn = async (req: Request, res: Response) => {
     user.refreshToken = refreshToken;
     user.token = token;
 
-    user.boards.map((board: IBoard) => {
-      board.columns = undefined;
-      board.users = undefined;
-    });
+    user.boards = undefined;
 
     return res.json({
       email: user.email,

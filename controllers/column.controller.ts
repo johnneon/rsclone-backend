@@ -67,6 +67,8 @@ const UpdateColumn = async (req: Request, res: Response) => {
 
     if (name) {
       column.name = name;
+
+      column.save();
     }
 
     if (position || position === 0) {
