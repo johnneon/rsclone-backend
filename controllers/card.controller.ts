@@ -121,18 +121,14 @@ const DeleteCard = async (req: Request, res: Response) => {
   try {
     const card: ICard = await Card.findByIdAndDelete(req.params.id);
 
-    if (card) {
-      await Column.updateOne(
-        { _id: card.columnId },
-        { $pull: { cards: req.params.id } }
-      );
-      
-      return card;
-    }
-
     if (!card) {
       return res.status(404).json({ message: global.CARD_NOT_FOUND });
     }
+
+    await Column.updateOne(
+      { _id: card.columnId },
+      { $pull: { cards: req.params.id } }
+    );
 
     return res.status(200).json({ message: global.CARD_DELETED });
   } catch (e) {
