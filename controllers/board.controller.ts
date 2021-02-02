@@ -153,14 +153,16 @@ const DeleteBoard = async (req: Request, res: Response) => {
 
 const InviteUser = async (req: Request, res: Response) => {
   try {
-    const { from, to, board } = req.body;
+    const { from, to, boardId } = req.body;
+
+    const board = await Board.findById(boardId);
 
     if (!from || !to || !board) {
       return res.status(400).json({ message: INCORECT_DATA });
     }
 
     const user =  await User.findOneAndUpdate({ email: to }, {
-      $push: { notifications: { from, to, board } }
+      $push: { notifications: { from, to, boardId, boardName: board.name } }
     });
 
     if (!user) {
@@ -179,7 +181,7 @@ const AcceptInvite = async (req: Request, res: Response) => {
     const id = req.params.id;
 
     const user =  await User.findByIdAndUpdate(userId, {
-      $pull: { notifications: { board: id } },
+      $pull: { notifications: { boardId: id } },
       $push: { boards: id }
     });
 
@@ -199,11 +201,11 @@ const AcceptInvite = async (req: Request, res: Response) => {
 
 const IgnoreInvite = async (req: Request, res: Response) => {
   try {
-    const { userId, notifications } = req.body.user;
+    const { userId } = req.body.user;
     const id = req.params.id;
 
     const user =  await User.findByIdAndUpdate(userId, {
-      $pull: { notifications: { board: id } },
+      $pull: { notifications: { boardId: id } },
       $push: { boards: id }
     });
 

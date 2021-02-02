@@ -3,7 +3,8 @@ import { Schema, model, Types, Document } from 'mongoose';
 interface Invite {
   from: string;
   to: string;
-  board: string;
+  boardId: string;
+  boardName: string;
 }
 export interface IUser extends Document {
   email: string;
