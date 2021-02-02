@@ -152,6 +152,20 @@ const GetNewToken = async (req: Request, res: Response) => {
   }
 };
 
+const GetUserData = async (req: Request, res: Response) => {
+  try {
+    const { userId } = req.body.user;
+    const user: IUser = await User.findById(userId);
+    await RefreshToken.findOneAndDelete({ userId });
+    
+    user.password = undefined;
+
+    return res.status(201).json(user);
+  } catch (e) {
+    return res.status(500).json({ message: RANDOM_ERROR });
+  }
+};
+
 const LogOut = async (req: Request, res: Response) => {
   try {
     const { userId } = req.body;
@@ -168,5 +182,6 @@ export default {
   CreateUser,
   SignIn,
   GetNewToken,
-  LogOut
+  LogOut,
+  GetUserData
 };

@@ -31,10 +31,7 @@ const CreateBoard = async (req: Request, res: Response) => {
       })
       .catch((err) => err);
 
-    const { notifications } = req.body.user;
-    const response = { data: board, notifications };
-
-    return res.status(201).json(response);
+    return res.status(201).json(board);
   } catch (e) {
     return res.status(500).json({ message: RANDOM_ERROR });
   }
@@ -74,7 +71,7 @@ const GetFullBoard = async (req: Request, res: Response) => {
 
 const GetAllBoards = async (req: Request, res: Response) => {
   try {
-    const { userId, notifications } = req.body.user;
+    const { userId } = req.body.user;
 
     const boards: Array<IBoard> = await Board.find({ users: { $in: [ userId ] } });
 
@@ -83,9 +80,7 @@ const GetAllBoards = async (req: Request, res: Response) => {
       board.columns = undefined;
     });
 
-    const response = { data: boards, notifications };
-
-    return res.status(201).json(response);
+    return res.status(201).json(boards);
   } catch (e) {
     return res.status(500).json({ message: RANDOM_ERROR });
   }
@@ -106,10 +101,7 @@ const UpdateBoard = async (req: Request, res: Response) => {
     updatedBoard.users = undefined;
     updatedBoard.columns = undefined;
 
-    const { notifications } = req.body.user;
-    const response = { data: updatedBoard, notifications };
-
-    return res.status(201).json(response);
+    return res.status(201).json(updatedBoard);
   } catch (e) {
     return res.status(500).json({ message: RANDOM_ERROR });
   }
@@ -117,7 +109,7 @@ const UpdateBoard = async (req: Request, res: Response) => {
 
 const DeleteBoard = async (req: Request, res: Response) => {
   try {
-    const { userId, notifications } = req.body.user;
+    const { userId } = req.body.user;
     const _id = req.params.id;
     
     const board: IBoard = await Board.findOne({ _id }, async (err: Errback, Board: IBoard) => {
@@ -147,9 +139,7 @@ const DeleteBoard = async (req: Request, res: Response) => {
       { $pull: { boards: _id } }
     );
 
-    const response = { data: { message: LEFT_BOARD }, notifications };
-
-    return res.status(201).json(response);
+    return res.status(201).json({ message: LEFT_BOARD });
   } catch (e) {
     return res.status(500).json({ message: RANDOM_ERROR });
   }
@@ -171,10 +161,7 @@ const InviteUser = async (req: Request, res: Response) => {
       return res.status(404).json({ message: USER_NOT_FOUND });
     }
 
-    const { notifications } = req.body.user;
-    const response = { data: { message: "User will get invite!" }, notifications };
-
-    return res.status(201).json(response);
+    return res.status(201).json({ message: "User will get invite!" });
   } catch (e) {
     return res.status(500).json({ message: RANDOM_ERROR });
   }
@@ -198,9 +185,7 @@ const AcceptInvite = async (req: Request, res: Response) => {
       return res.status(404).json({ message: USER_NOT_FOUND });
     }
     
-    const response = { data: { message: "Welcome to our board!" }, notifications };
-
-    return res.status(201).json(response);
+    return res.status(201).json({ message: "Welcome to our board!" });
   } catch (e) {
     return res.status(500).json({ message: RANDOM_ERROR });
   }
@@ -220,9 +205,7 @@ const IgnoreInvite = async (req: Request, res: Response) => {
       return res.status(404).json({ message: USER_NOT_FOUND });
     }
 
-    const response = { data: { message: "Notification has been daleted!" }, notifications };
-
-    return res.status(201).json(response);
+    return res.status(201).json({ message: "Notification has been daleted!" });
   } catch (e) {
     return res.status(500).json({ message: RANDOM_ERROR });
   }

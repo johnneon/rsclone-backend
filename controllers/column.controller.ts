@@ -36,10 +36,7 @@ const CreateColumn = async (req: Request, res: Response) => {
       })
       .catch((err) => err);
 
-    const { notifications } = req.body.user;
-    const response = { data: column, notifications };
-
-    return res.status(201).json(response);
+    return res.status(201).json(column);
   } catch (e) {
     return res.status(500).json({ message: RANDOM_ERROR });
   }
@@ -53,10 +50,7 @@ const GetColumn = async (req: Request, res: Response) => {
       return res.status(404).json({ message: COLUMN_NOT_FOUND });
     }
 
-    const { notifications } = req.body.user;
-    const response = { data: column, notifications };
-
-    return res.status(201).json(response);
+    return res.status(201).json(column);
   } catch (e) {
     return res.status(500).json({ message: RANDOM_ERROR });
   }
@@ -120,10 +114,7 @@ const UpdateColumn = async (req: Request, res: Response) => {
       
     }
 
-    const { notifications } = req.body.user;
-    const response = { data: column, notifications };
-
-    return res.status(201).json(response);
+    return res.status(201).json(column);
   } catch (e) {
     return res.status(500).json({ message: RANDOM_ERROR });
   }
@@ -146,10 +137,7 @@ const DeleteColumn = async (req: Request, res: Response) => {
 
     await Card.deleteMany({ column: column._id });
 
-    const { notifications } = req.body.user;
-    const response = { data: { message: DELETED_COLUMN }, notifications };
-
-    return res.status(201).json(response);
+    return res.status(201).json({ message: DELETED_COLUMN });
   } catch (e) {
     return res.status(500).json({ message: RANDOM_ERROR });
   }

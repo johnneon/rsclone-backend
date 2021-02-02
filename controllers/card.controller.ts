@@ -35,10 +35,7 @@ const CreateCard = async (req: Request, res: Response) => {
       })
       .catch((err) => err);
 
-    const { notifications } = req.body.user;
-    const response = { data: card, notifications };
-
-    return res.status(201).json(response);
+    return res.status(201).json(card);
   } catch (e) {
     return res.status(500).json({ message: RANDOM_ERROR });
   }
@@ -52,10 +49,7 @@ const GetCard = async (req: Request, res: Response) => {
       return res.status(404).json({ message: CARD_NOT_FOUND });
     }
 
-    const { notifications } = req.body.user;
-    const response = { data: card, notifications };
-
-    return res.status(201).json(response);
+    return res.status(201).json(card);
   } catch (e) {
     return res.status(500).json({ message: RANDOM_ERROR });
   }
@@ -127,10 +121,7 @@ const UpdateCard = async (req: Request, res: Response) => {
 
     card.save();
 
-    const { notifications } = req.body.user;
-    const response = { data: card, notifications };
-
-    return res.status(201).json(response);
+    return res.status(201).json(card);
   } catch (e) {
     return res.status(500).json({ message: RANDOM_ERROR });
   }
@@ -149,10 +140,7 @@ const DeleteCard = async (req: Request, res: Response) => {
       { $pull: { cards: req.params.id } }
     );
 
-    const { notifications } = req.body.user;
-    const response = { data: { message: CARD_DELETED }, notifications };
-
-    return res.status(201).json(response);
+    return res.status(201).json({ message: CARD_DELETED });
   } catch (e) {
     return res.status(500).json({ message: RANDOM_ERROR });
   }

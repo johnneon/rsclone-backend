@@ -1,10 +1,13 @@
 import { Router } from 'express';
 import AuthController from '../controllers/user.controller';
 import checkMiddleware from '../middleware/check.middleware';
+import auth from '../middleware/auth.middleware';
 
 const authRouter = Router();
 
 authRouter.post('/register', checkMiddleware.checkRegister, AuthController.CreateUser);
+
+authRouter.get('/get_user', auth, AuthController.GetUserData);
 
 authRouter.post('/login', checkMiddleware.checkLogin, AuthController.SignIn);
 
