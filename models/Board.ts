@@ -7,12 +7,14 @@ export interface IBoard extends Document {
   users: Array<IUser['_id'] | object>;
   columns: Array<string>;
   boardId?: string;
+  background?: Object;
 }
 
 const BoardSchema: Schema = new Schema({
   name: { type: String, required: true, unique: false },
   users: [{ type: Types.ObjectId, ref: 'User' }],
-  columns: [{ type: Types.ObjectId, ref: 'Column' }]
+  columns: [{ type: Types.ObjectId, ref: 'Column' }],
+  background: { type: Object }
 }, {
   versionKey: false
 });

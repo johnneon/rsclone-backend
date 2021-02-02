@@ -4,18 +4,28 @@ import Board, { IBoard } from './../models/Board';
 import Card from '../models/Card';
 import global from '../variables';
 
+const {
+  FORBIDDEN_SYMBOLS_REGEXP,
+  INCORECT_CHARTS,
+  RANDOM_ERROR,
+  BOARD_NOT_FOUND,
+  COLUMN_NOT_FOUND,
+  INCORECT_POSITION,
+  DELETED_COLUMN
+} = global;
+
 const CreateColumn = async (req: Request, res: Response) => {
   try {
     const { name, boardId } = req.body;
 
-    const check = global.FORBIDDEN_SYMBOLS_REGEXP;
+    const check = FORBIDDEN_SYMBOLS_REGEXP;
   
     if (check.test(name)) {
-      return res.status(400).json({ message: global.INCORECT_CHARTS });
+      return res.status(400).json({ message: INCORECT_CHARTS });
     }
   
     if (!boardId) {
-      return res.status(404).json({ message: global.BOARD_NOT_FOUND });
+      return res.status(404).json({ message: BOARD_NOT_FOUND });
     }
   
     const column =  await Column
@@ -26,9 +36,12 @@ const CreateColumn = async (req: Request, res: Response) => {
       })
       .catch((err) => err);
 
-    return res.status(201).json(column);
+    const { notifications } = req.body.user;
+    const response = { data: column, notifications };
+
+    return res.status(201).json(response);
   } catch (e) {
-    return res.status(500).json({ message: global.RANDOM_ERROR });
+    return res.status(500).json({ message: RANDOM_ERROR });
   }
 }
 
@@ -37,12 +50,15 @@ const GetColumn = async (req: Request, res: Response) => {
     const column: IColumn = await Column.findById(req.params.id).populate('cards');
 
     if (!column) {
-      return res.status(404).json({ message: global.COLUMN_NOT_FOUND });
+      return res.status(404).json({ message: COLUMN_NOT_FOUND });
     }
 
-    return res.status(201).json(column);
+    const { notifications } = req.body.user;
+    const response = { data: column, notifications };
+
+    return res.status(201).json(response);
   } catch (e) {
-    return res.status(500).json({ message: global.RANDOM_ERROR });
+    return res.status(500).json({ message: RANDOM_ERROR });
   }
 };
 
@@ -52,17 +68,17 @@ const UpdateColumn = async (req: Request, res: Response) => {
     const { id } = req.params;
 
     if (name) {
-      const check = global.FORBIDDEN_SYMBOLS_REGEXP;
+      const check = FORBIDDEN_SYMBOLS_REGEXP;
 
       if (check.test(name)) {
-        return res.status(400).json({ message: global.INCORECT_CHARTS });
+        return res.status(400).json({ message: INCORECT_CHARTS });
       }
     }
 
     const column: IColumn = await Column.findById(id);
 
     if (!column) {
-      return res.status(404).json({ message: global.COLUMN_NOT_FOUND });
+      return res.status(404).json({ message: COLUMN_NOT_FOUND });
     }
 
     if (name) {
@@ -76,11 +92,11 @@ const UpdateColumn = async (req: Request, res: Response) => {
       const board: IBoard = await Board.findById(column.boardId);
 
       if (!board) {
-        return res.status(404).json({ message: global.BOARD_NOT_FOUND });
+        return res.status(404).json({ message: BOARD_NOT_FOUND });
       }
 
       if (position > board.columns.length || position < 0) {
-        return res.status(400).json({ message: global.INCORECT_POSITION });
+        return res.status(400).json({ message: INCORECT_POSITION });
       }
 
       const pasteColumn = {
@@ -103,10 +119,13 @@ const UpdateColumn = async (req: Request, res: Response) => {
       await Board.findOneAndUpdate(boardId, pasteColumn).catch((e) => e);
       
     }
-  
-    return res.status(201).json(column);
+
+    const { notifications } = req.body.user;
+    const response = { data: column, notifications };
+
+    return res.status(201).json(response);
   } catch (e) {
-    return res.status(500).json({ message: global.RANDOM_ERROR });
+    return res.status(500).json({ message: RANDOM_ERROR });
   }
 };
 
@@ -115,7 +134,7 @@ const DeleteColumn = async (req: Request, res: Response) => {
     const column: IColumn = await Column.findByIdAndDelete(req.params.id);
 
     if (!column) {
-      return res.status(400).json({ message: global.COLUMN_NOT_FOUND });
+      return res.status(400).json({ message: COLUMN_NOT_FOUND });
     }
 
     await Board.updateOne(
@@ -127,9 +146,12 @@ const DeleteColumn = async (req: Request, res: Response) => {
 
     await Card.deleteMany({ column: column._id });
 
-    return res.status(201).json({ message: global.DELETED_COLUMN });
+    const { notifications } = req.body.user;
+    const response = { data: { message: DELETED_COLUMN }, notifications };
+
+    return res.status(201).json(response);
   } catch (e) {
-    return res.status(500).json({ message: global.RANDOM_ERROR });
+    return res.status(500).json({ message: RANDOM_ERROR });
   }
 };
 
