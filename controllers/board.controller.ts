@@ -15,8 +15,8 @@ const {
 
 const CreateBoard = async (req: Request, res: Response) => {
   try {
-    const { name, user } = req.body;
-  
+    const { name, user, background } = req.body;
+
     const check = FORBIDDEN_SYMBOLS_REGEXP;
   
     if (check.test(name)) {
@@ -24,7 +24,7 @@ const CreateBoard = async (req: Request, res: Response) => {
     }
   
     const board: IBoard =  await Board
-      .create({ name, users: [user.userId] })
+      .create({ name, users: [user.userId], background })
       .then( async (data: IBoard) => {
         await User.updateOne({ _id: user.userId }, {'$push' : {'boards': data._id} });
         return data;
@@ -88,20 +88,26 @@ const GetAllBoards = async (req: Request, res: Response) => {
 
 const UpdateBoard = async (req: Request, res: Response) => {
   try {
-    const { name } = req.body;
+    const { name, background } = req.body;
     const _id = req.params.id;
 
-    const board: IBoard = await Board.findOneAndUpdate({ _id }, { name });
+    const board: IBoard = await Board.findById(_id);
+
     if (!board) {
       return res.status(404).json({ message: BOARD_NOT_FOUND }); 
     }
 
-    const updatedBoard: IBoard = await Board.findById({ _id });
-      
-    updatedBoard.users = undefined;
-    updatedBoard.columns = undefined;
+    if (name) {
+      board.name = name;
+    }
 
-    return res.status(201).json(updatedBoard);
+    if (background) {
+      board.background = background;
+    }
+
+    board.save();
+
+    return res.status(201).json(board);
   } catch (e) {
     return res.status(500).json({ message: RANDOM_ERROR });
   }
