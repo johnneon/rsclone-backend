@@ -114,13 +114,14 @@ const SignIn = async (req: Request, res: Response) => {
 const GetNewToken = async (req: Request, res: Response) => {
   try {
     const { refreshToken } = req.body;
+    console.log(refreshToken);
 
     if (!refreshToken) {
       return res.status(403).json({ message: MISSING_TOKEN });
     }
 
     const token: IToken = await RefreshToken.findOne({ refreshToken });
-
+    console.log(token);
     if (!token) {
       return res.status(401).json({ message: TOKEN_EXPIRED });
     }
@@ -129,11 +130,13 @@ const GetNewToken = async (req: Request, res: Response) => {
     const refreshSecret = process.env.REFRESH_JWT_SECRET || 'protecteuptodate';
 
     const payload = jwt.verify(token.refreshToken, refreshSecret);
-
+    console.log(payload);
     const accessToken = jwt.sign({ userId: payload['userId'] }, secret, { expiresIn: '4h' });
-
+    console.log(accessToken);
     return res.status(200).json({ token: accessToken, userId: payload['userId'] });
   } catch (e) {
+    console.log(e);
+    console.log(e.name);
     if (e.name === TOKEN_EXPIRED_ERROR) {
       const { refreshToken } = req.body;
 
