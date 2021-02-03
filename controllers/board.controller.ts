@@ -193,16 +193,15 @@ const AcceptInvite = async (req: Request, res: Response) => {
     const { userId } = req.body.user;
     const id = req.params.id;
 
-    const user: IUser =  await User.findOne({ _id: userId });
+    const board: IBoard =  await Board.findById(id);
 
-    if (!user) {
-      return res.status(404).json({ message: USER_NOT_FOUND });
+    if (!board) {
+      return res.status(404).json({ message: BOARD_NOT_FOUND });
     }
 
-    const checkBoards = user.boards.findIndex((el) => el.toString() === id.toString());
-    const checkInvites = user.notifications.findIndex((el) => el.boardId === id);
+    const checkUsers = board.users.findIndex((el) => el.toString() === userId.toString());
     
-    if (!(checkBoards === -1) || !(checkInvites === -1)) {
+    if (!(checkUsers === -1)) {
       return res.status(400).json({ message: USER_INVITED });
     }
 
@@ -226,16 +225,15 @@ const IgnoreInvite = async (req: Request, res: Response) => {
     const { userId } = req.body.user;
     const id = req.params.id;
 
-    const user: IUser =  await User.findOne({ _id: userId });
+    const board: IBoard =  await Board.findById(id);
 
-    if (!user) {
-      return res.status(404).json({ message: USER_NOT_FOUND });
+    if (!board) {
+      return res.status(404).json({ message: BOARD_NOT_FOUND });
     }
 
-    const checkBoards = user.boards.findIndex((el) => el.toString() === id.toString());
-    const checkInvites = user.notifications.findIndex((el) => el.boardId === id);
+    const checkUsers = board.users.findIndex((el) => el.toString() === userId.toString());
     
-    if (!(checkBoards === -1) || !(checkInvites === -1)) {
+    if (!(checkUsers === -1)) {
       return res.status(400).json({ message: USER_INVITED });
     }
 
