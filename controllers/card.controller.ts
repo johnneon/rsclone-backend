@@ -57,7 +57,7 @@ const GetCard = async (req: Request, res: Response) => {
 
 const UpdateCard = async (req: Request, res: Response) => {
   try {
-    const { name, position, content, columnId, add, kick } = req.body;
+    const { name, position, content, columnId, add, kick, label } = req.body;
     const { id } = req.params;
 
     const card: ICard = await Card.findById(id);
@@ -66,6 +66,16 @@ const UpdateCard = async (req: Request, res: Response) => {
 
     if (!card) {
       return res.status(404).json({ message: CARD_NOT_FOUND });
+    }
+
+    if (label) {
+      const checkLabel = card.labels.findIndex((el) => el.color === label.color);
+
+      if (checkLabel === -1) {
+        card.labels.push(label);
+      }
+
+      card.labels.splice(checkLabel, 1, label);
     }
 
     if (add) {
