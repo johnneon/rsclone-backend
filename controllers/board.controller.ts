@@ -64,6 +64,7 @@ const GetFullBoard = async (req: Request, res: Response) => {
     users.map((user: IUser) => {
       user.password = undefined;
       user.boards = undefined;
+      user.notifications = undefined;
     });
 
     return res.status(201).json(board);
