@@ -70,16 +70,21 @@ const UpdateCard = async (req: Request, res: Response) => {
 
     if (label) {
       const checkLabel = card.labels.findIndex((el) => el.color === label.color);
-
+      
       if (checkLabel === -1) {
         card.labels.push(label);
+      } else {
+        card.labels.splice(checkLabel, 1);
       }
-
-      card.labels.splice(checkLabel, 1, label);
     }
 
     if (add) {
-      card.users.push(add);
+      const index = card.users.indexOf(add);
+      console.log(index);
+
+      if (index === -1) {
+        card.users.push(add);
+      }
     }
 
     if (kick) {

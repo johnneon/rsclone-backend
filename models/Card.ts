@@ -11,7 +11,7 @@ export interface ICard extends Document {
   position: number;
   columnId: IColumn['_id'];
   content?: string;
-  labels?: Array<Label>;
+  labels: Array<Label>;
   users?: Array<string>;
 }
 

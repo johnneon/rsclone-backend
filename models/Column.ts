@@ -1,6 +1,4 @@
 import { Schema, model, Types, Document } from 'mongoose';
-import { ICard } from './Card';
-
 export interface IColumn extends Document {
   name: string;
   position: number;

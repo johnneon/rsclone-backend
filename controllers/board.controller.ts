@@ -1,7 +1,10 @@
+import { Label } from './../models/Card';
+import { IColumn } from './../models/Column';
 import { Errback, Request, Response } from 'express';
 import Board, { IBoard } from './../models/Board';
 import User, { IUser } from '../models/User';
 import global from '../variables';
+import { ICard } from '../models/Card';
 
 const {
   FORBIDDEN_SYMBOLS_REGEXP,
@@ -26,9 +29,25 @@ const CreateBoard = async (req: Request, res: Response) => {
     if (check.test(name)) {
       return res.status(400).json({ message: INCORECT_CHARTS });
     }
+
+    const labels = [
+      { color: '#ef5350', textColor: '#fff', name: '' },
+      { color: '#9c27b0', textColor: '#fff', name: '' },
+      { color: '#2196f3', textColor: '#fff', name: '' },
+      { color: '#3f51b5', textColor: '#fff', name: '' },
+      { color: '#ff5722', textColor: '#fff', name: '' },
+      { color: '#009688', textColor: '#fff', name: '' },
+      { color: '#00bcd4', textColor: '#000', name: '' },
+      { color: '#8bc34a', textColor: '#000', name: '' },
+      { color: '#cddc39', textColor: '#000', name: '' },
+      { color: '#4caf50', textColor: '#000', name: '' },
+      { color: '#ffeb3b', textColor: '#000', name: '' },
+      { color: '#ffc107', textColor: '#000', name: '' },
+      { color: '#ff9800', textColor: '#000', name: '' },
+    ];
   
     const board: IBoard =  await Board
-      .create({ name, users: [user.userId], background })
+      .create({ name, users: [user.userId], background, labels })
       .then( async (data: IBoard) => {
         await User.updateOne({ _id: user.userId }, {'$push' : {'boards': data._id} });
         return data;
@@ -46,7 +65,10 @@ const GetFullBoard = async (req: Request, res: Response) => {
     const boardPopulate = {
       path: 'columns',
       populate: {
-        path: 'cards'
+        path: 'cards',
+        populate: {
+          path: 'users'
+        }
       }
     }
   
@@ -59,7 +81,20 @@ const GetFullBoard = async (req: Request, res: Response) => {
       return res.status(404).json({ message: BOARD_NOT_FOUND }); 
     }
   
-    const { users } = board;
+    const { users, columns, labels } = board;
+
+    columns.map((column: any) => {
+      column.cards.map((card: ICard) => {
+        card.labels.forEach((label: Label) => {
+          label.name = labels.find((el) => el.color === label.color).name;
+        });
+        card.users.map((user: any) => {
+          user.password = undefined;
+          user.boards = undefined;
+          user.notifications = undefined;
+        });
+      });
+    });
   
     users.map((user: IUser) => {
       user.password = undefined;
@@ -93,7 +128,7 @@ const GetAllBoards = async (req: Request, res: Response) => {
 
 const UpdateBoard = async (req: Request, res: Response) => {
   try {
-    const { name, background } = req.body;
+    const { name, background, label } = req.body;
     const _id = req.params.id;
 
     const board: IBoard = await Board.findById(_id);
@@ -104,6 +139,13 @@ const UpdateBoard = async (req: Request, res: Response) => {
 
     if (name) {
       board.name = name;
+    }
+
+    if (label) {
+      console.log(label);
+      const labelIndex = board.labels.findIndex((el) => el.color === label.color);
+
+      board.labels.splice(labelIndex, 1, label);
     }
 
     if (background) {
