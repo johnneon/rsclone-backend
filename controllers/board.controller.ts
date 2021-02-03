@@ -10,7 +10,11 @@ const {
   BOARD_NOT_FOUND,
   LEFT_BOARD,
   USER_NOT_FOUND,
-  INCORECT_DATA
+  INCORECT_DATA,
+  USER_INVITED,
+  NOT_DELETED,
+  WELCOME_BOARD,
+  WILL_GET_INVITE
 } = global;
 
 const CreateBoard = async (req: Request, res: Response) => {
@@ -161,15 +165,24 @@ const InviteUser = async (req: Request, res: Response) => {
       return res.status(400).json({ message: INCORECT_DATA });
     }
 
-    const user =  await User.findOneAndUpdate({ email: to }, {
-      $push: { notifications: { from, to, boardId, boardName: board.name } }
-    });
+    const user: IUser =  await User.findOne({ email: to });
 
     if (!user) {
       return res.status(404).json({ message: USER_NOT_FOUND });
     }
 
-    return res.status(201).json({ message: "User will get invite!" });
+    const checkBoards = user.boards.findIndex((el) => el.toString() === boardId.toString());
+    const checkInvites = user.notifications.findIndex((el) => el.boardId === boardId);
+    
+    if (!(checkBoards === -1) || !(checkInvites === -1)) {
+      return res.status(400).json({ message: USER_INVITED });
+    }
+
+    await User.findOneAndUpdate({ email: to }, {
+      $push: { notifications: { from, to, boardId, boardName: board.name } }
+    });
+
+    return res.status(201).json({ message: WILL_GET_INVITE });
   } catch (e) {
     return res.status(500).json({ message: RANDOM_ERROR });
   }
@@ -177,23 +190,32 @@ const InviteUser = async (req: Request, res: Response) => {
 
 const AcceptInvite = async (req: Request, res: Response) => {
   try {
-    const { userId, notifications } = req.body.user;
+    const { userId } = req.body.user;
     const id = req.params.id;
 
-    const user =  await User.findByIdAndUpdate(userId, {
-      $pull: { notifications: { boardId: id } },
-      $push: { boards: id }
-    });
-
-    const board = await Board.findByIdAndUpdate(id, {
-      $push: { users: userId }
-    });
+    const user: IUser =  await User.findOne({ _id: userId });
 
     if (!user) {
       return res.status(404).json({ message: USER_NOT_FOUND });
     }
+
+    const checkBoards = user.boards.findIndex((el) => el.toString() === id.toString());
+    const checkInvites = user.notifications.findIndex((el) => el.boardId === id);
     
-    return res.status(201).json({ message: "Welcome to our board!" });
+    if (!(checkBoards === -1) || !(checkInvites === -1)) {
+      return res.status(400).json({ message: USER_INVITED });
+    }
+
+    await User.findByIdAndUpdate(userId, {
+      $pull: { notifications: { boardId: id } },
+      $push: { boards: id }
+    });
+
+    await Board.findByIdAndUpdate(id, {
+      $push: { users: userId }
+    });
+    
+    return res.status(201).json({ message: WELCOME_BOARD });
   } catch (e) {
     return res.status(500).json({ message: RANDOM_ERROR });
   }
@@ -204,16 +226,25 @@ const IgnoreInvite = async (req: Request, res: Response) => {
     const { userId } = req.body.user;
     const id = req.params.id;
 
-    const user =  await User.findByIdAndUpdate(userId, {
-      $pull: { notifications: { boardId: id } },
-      $push: { boards: id }
-    });
+    const user: IUser =  await User.findOne({ _id: userId });
 
     if (!user) {
       return res.status(404).json({ message: USER_NOT_FOUND });
     }
 
-    return res.status(201).json({ message: "Notification has been daleted!" });
+    const checkBoards = user.boards.findIndex((el) => el.toString() === id.toString());
+    const checkInvites = user.notifications.findIndex((el) => el.boardId === id);
+    
+    if (!(checkBoards === -1) || !(checkInvites === -1)) {
+      return res.status(400).json({ message: USER_INVITED });
+    }
+
+    await User.findByIdAndUpdate(userId, {
+      $pull: { notifications: { boardId: id } },
+      $push: { boards: id }
+    });
+
+    return res.status(201).json({ message: NOT_DELETED });
   } catch (e) {
     return res.status(500).json({ message: RANDOM_ERROR });
   }

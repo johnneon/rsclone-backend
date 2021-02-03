@@ -26,4 +26,8 @@ export default {
   MISSING_TOKEN: 'Access denied,token missing!',
   TOKEN_EXPIRED: 'Token expired!',
   METHOD_OPTIONS: 'OPTIONS',
+  NOT_DELETED: 'Notification has been daleted!',
+  USER_INVITED: 'User has already been invited!',
+  WELCOME_BOARD: 'Welcome to our board!',
+  WILL_GET_INVITE: 'User will get invite!',
 }
