@@ -83,12 +83,12 @@ const GetFullBoard = async (req: Request, res: Response) => {
   
     const { users, columns, labels } = board;
 
-    columns.map((column: any) => {
+    columns.map((column: IColumn) => {
       column.cards.map((card: ICard) => {
         card.labels.forEach((label: Label) => {
           label.name = labels.find((el) => el.color === label.color).name;
         });
-        card.users.map((user: any) => {
+        card.users.map((user: IUser) => {
           user.password = undefined;
           user.boards = undefined;
           user.notifications = undefined;

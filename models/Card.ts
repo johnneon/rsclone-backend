@@ -1,4 +1,5 @@
 import { Schema, model, Types, Document } from 'mongoose';
+import { IUser } from './User';
 import { IColumn } from './Column';
 
 export interface Label {
@@ -9,10 +10,10 @@ export interface Label {
 export interface ICard extends Document {
   name: string;
   position: number;
-  columnId: IColumn['_id'];
+  columnId: string;
   content?: string;
   labels: Array<Label>;
-  users?: Array<string>;
+  users?: Array<IUser | string>;
 }
 
 const CardSchema: Schema = new Schema({

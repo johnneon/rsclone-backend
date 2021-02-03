@@ -1,4 +1,5 @@
 import { Schema, model, Types, Document } from 'mongoose';
+import { IColumn } from './Column';
 import { IUser } from './User';
 
 export interface Label {
@@ -9,7 +10,7 @@ export interface Label {
 export interface IBoard extends Document {
   name: string;
   users: Array<IUser['_id'] | object>;
-  columns: Array<string>;
+  columns: Array<IColumn | string>;
   labels: Array<Label>;
   boardId?: string;
   background?: string;
