@@ -1,3 +1,4 @@
+import { IUser } from './../models/User';
 import { Request, Response } from 'express';
 import Column from './../models/Column';
 import Card, { ICard } from '../models/Card';
@@ -80,7 +81,6 @@ const UpdateCard = async (req: Request, res: Response) => {
 
     if (add) {
       const index = card.users.indexOf(add);
-      console.log(index);
 
       if (index === -1) {
         card.users.push(add);
@@ -144,9 +144,17 @@ const UpdateCard = async (req: Request, res: Response) => {
       card.columnId = currentColumn;
     }
 
-    card.save();
+    await card.save();
 
-    return res.status(201).json(card);
+    const updatedCard: ICard = await Card.findById(id).populate('users');
+
+    updatedCard.users.map((user: IUser) => {
+      user.password = undefined;
+      user.boards = undefined;
+      user.notifications = undefined;
+    });
+
+    return res.status(201).json(updatedCard);
   } catch (e) {
     return res.status(500).json({ message: RANDOM_ERROR });
   }
