@@ -174,7 +174,7 @@ const InviteUser = async (req: Request, res: Response) => {
       return res.status(404).json({ message: USER_NOT_FOUND });
     }
 
-    if (user?.notifications) {
+    if (user.notifications) {
       const checkBoards = user.boards.findIndex((el) => el.toString() === boardId.toString());
       const checkInvites = user.notifications.findIndex((el) => el.boardId === boardId);
 
