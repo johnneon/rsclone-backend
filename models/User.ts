@@ -23,7 +23,7 @@ const UserSchema: Schema = new Schema({
   password: { type: String, required: true },
   fullName: { type: String, required: true },
   boards: [{ type: Types.ObjectId, ref: 'Board' }],
-  notifications: { type: Object }
+  notifications: [{ type: Object }]
 }, {
   versionKey: false
 });

@@ -174,12 +174,15 @@ const InviteUser = async (req: Request, res: Response) => {
       return res.status(404).json({ message: USER_NOT_FOUND });
     }
 
-    const checkBoards = user.boards.findIndex((el) => el.toString() === boardId.toString());
-    const checkInvites = user.notifications.findIndex((el) => el.boardId === boardId);
-    
-    if (!(checkBoards === -1) || !(checkInvites === -1)) {
-      return res.status(400).json({ message: USER_INVITED });
+    if (user?.notifications) {
+      const checkBoards = user.boards.findIndex((el) => el.toString() === boardId.toString());
+      const checkInvites = user.notifications.findIndex((el) => el.boardId === boardId);
+
+      if (!(checkBoards === -1) || !(checkInvites === -1)) {
+        return res.status(400).json({ message: USER_INVITED });
+      }
     }
+    
 
     await User.findOneAndUpdate({ email: to }, {
       $push: { notifications: { from, to, boardId, boardName: board.name } }
