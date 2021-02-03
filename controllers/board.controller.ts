@@ -135,6 +135,8 @@ const DeleteBoard = async (req: Request, res: Response) => {
       if (user !== -1) {
         users.splice(user, 1);
       }
+
+      Board.save();
   
       if (Board.users.length === 0) {
         Board.delete();
